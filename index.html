@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MajiHesabu - Customer Portal</title>
+    
+    <!-- ✅ CRITICAL: config.js MUST load FIRST before anything else uses it -->
+    <script src="config.js"></script>
+    
     <style>
         * {
             margin: 0;
@@ -17,7 +21,6 @@
             --accent: #C49424;
             --success: #4CAF50;
             --danger: #ff6b6b;
-            --warning: #ffc107;
             --light-bg: #f5f5f5;
             --text: #333;
             --border: #ddd;
@@ -30,23 +33,12 @@
             min-height: 100vh;
         }
 
-        /* ===== HEADER ===== */
         header {
             background: var(--primary);
             color: white;
             padding: 1.5rem;
+            text-align: center;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-
-        .header-content {
-            max-width: 1000px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
         }
 
         .logo {
@@ -55,964 +47,489 @@
             color: var(--accent);
         }
 
-        .logout-btn {
-            background: var(--danger);
-            color: white;
-            border: none;
-            padding: 0.6rem 1.2rem;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: all 0.3s ease;
-        }
-
-        .logout-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
-        }
-
-        /* ===== LOGIN PAGE ===== */
-        .login-container {
-            max-width: 500px;
-            margin: 4rem auto;
-            background: white;
-            padding: 2.5rem;
-            border-radius: 16px;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
-        }
-
-        .login-title {
-            font-size: 2rem;
-            font-weight: bold;
-            color: var(--primary);
-            text-align: center;
-            margin-bottom: 0.5rem;
-        }
-
-        .login-subtitle {
-            text-align: center;
-            color: #666;
-            margin-bottom: 2rem;
-            font-size: 0.95rem;
+        .container {
+            max-width: 600px;
+            margin: 2rem auto;
+            padding: 1rem;
         }
 
         .login-form {
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-        }
-
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-
-        .form-group label {
-            font-weight: 600;
-            color: var(--primary);
-            font-size: 0.95rem;
-        }
-
-        .form-group input {
-            padding: 1rem;
-            border: 2px solid var(--border);
-            border-radius: 8px;
-            font-family: inherit;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-        }
-
-        .form-group input:focus {
-            outline: none;
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px rgba(196, 148, 36, 0.1);
-        }
-
-        .login-btn {
-            background: linear-gradient(135deg, var(--accent), #a67a1a);
-            color: white;
-            border: none;
-            padding: 1rem;
-            border-radius: 8px;
-            font-weight: bold;
-            font-size: 1.05rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .login-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(196, 148, 36, 0.3);
-        }
-
-        .login-btn:active {
-            transform: translateY(-1px);
-        }
-
-        .login-message {
-            padding: 1rem;
-            border-radius: 8px;
-            text-align: center;
-            margin-bottom: 1rem;
-        }
-
-        .login-message.error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-
-        .login-message.info {
-            background: #d1ecf1;
-            color: #0c5460;
-            border: 1px solid #bee5eb;
-        }
-
-        /* ===== MAIN CONTAINER ===== */
-        .container {
-            max-width: 1000px;
-            margin: 0 auto;
-            padding: 2rem 1rem;
-        }
-
-        /* ===== CUSTOMER HEADER ===== */
-        .customer-header {
             background: white;
             padding: 2rem;
             border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
             margin-bottom: 2rem;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-            border-left: 4px solid var(--accent);
         }
 
-        .customer-info {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 1rem;
+        .form-group {
+            margin-bottom: 1.5rem;
         }
 
-        .customer-details h1 {
-            font-size: 1.8rem;
-            color: var(--primary);
+        label {
+            display: block;
             margin-bottom: 0.5rem;
-        }
-
-        .customer-details p {
-            color: #666;
-            font-size: 0.95rem;
-            margin: 0.25rem 0;
-        }
-
-        .account-status {
-            background: var(--success);
-            color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
             font-weight: 600;
-            font-size: 0.9rem;
-        }
-
-        .account-status.overdue {
-            background: var(--danger);
-        }
-
-        /* ===== QUICK STATS ===== */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin-bottom: 2rem;
-        }
-
-        .stat-card {
-            background: white;
-            padding: 1.5rem;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-            text-align: center;
-            border-top: 3px solid var(--accent);
-        }
-
-        .stat-label {
-            color: #666;
-            font-size: 0.85rem;
-            margin-bottom: 0.5rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .stat-value {
-            font-size: 1.8rem;
-            font-weight: bold;
             color: var(--primary);
         }
 
-        .stat-card.outstanding {
-            border-top-color: var(--danger);
+        input, select {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 1rem;
         }
 
-        .stat-card.current {
-            border-top-color: var(--warning);
+        .login-btn {
+            width: 100%;
+            padding: 1rem;
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 1rem;
         }
 
-        /* ===== TABS ===== */
+        .login-btn:hover {
+            opacity: 0.9;
+        }
+
+        .message {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border-left: 4px solid var(--success);
+        }
+
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border-left: 4px solid var(--danger);
+        }
+
+        .dashboard {
+            display: none;
+        }
+
+        .dashboard.active {
+            display: block;
+        }
+
         .tabs {
             display: flex;
             gap: 0.5rem;
             margin-bottom: 2rem;
             flex-wrap: wrap;
-            border-bottom: 2px solid white;
         }
 
         .tab-btn {
-            background: transparent;
-            border: none;
-            color: white;
-            padding: 1rem 1.5rem;
+            background: white;
+            border: 2px solid var(--border);
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
             cursor: pointer;
             font-weight: 600;
-            font-size: 0.95rem;
-            border-bottom: 3px solid transparent;
-            transition: all 0.3s ease;
-        }
-
-        .tab-btn:hover {
-            border-bottom-color: var(--accent);
         }
 
         .tab-btn.active {
-            border-bottom-color: var(--accent);
+            background: var(--accent);
+            color: white;
         }
 
         .tab-content {
             display: none;
-            animation: fadeIn 0.3s ease;
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
         }
 
         .tab-content.active {
             display: block;
         }
 
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* ===== INVOICES TABLE ===== */
-        .invoices-section {
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-            overflow: hidden;
-        }
-
-        .section-header {
-            background: var(--primary);
-            color: white;
+        .info-card {
+            background: var(--light-bg);
             padding: 1.5rem;
-            font-size: 1.2rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            border-left: 4px solid var(--accent);
+        }
+
+        .info-label {
+            font-size: 0.85rem;
+            color: #666;
+            margin-bottom: 0.3rem;
+        }
+
+        .info-value {
+            font-size: 1.3rem;
             font-weight: bold;
+            color: var(--primary);
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 0.95rem;
         }
 
-        thead {
-            background: var(--light-bg);
-            border-bottom: 2px solid var(--border);
-        }
-
-        th {
-            padding: 1rem;
+        table th, table td {
+            padding: 0.8rem;
             text-align: left;
-            font-weight: 600;
-            color: var(--primary);
-        }
-
-        td {
-            padding: 1rem;
             border-bottom: 1px solid var(--border);
         }
 
-        tbody tr:hover {
-            background: #fafafa;
-        }
-
-        .status-badge {
-            display: inline-block;
-            padding: 0.4rem 0.8rem;
-            border-radius: 20px;
-            font-weight: 600;
-            font-size: 0.85rem;
-        }
-
-        .status-badge.paid {
-            background: #d4edda;
-            color: #155724;
-        }
-
-        .status-badge.unpaid {
-            background: #f8d7da;
-            color: #721c24;
-        }
-
-        .status-badge.partial {
-            background: #fff3cd;
-            color: #856404;
-        }
-
-        .amount {
-            font-weight: bold;
-            color: var(--primary);
-            font-size: 1.05rem;
-        }
-
-        .empty-message {
-            text-align: center;
-            padding: 2rem;
-            color: #999;
-            font-size: 1rem;
-        }
-
-        /* ===== CONSUMPTION CHART ===== */
-        .chart-container {
-            background: white;
-            padding: 2rem;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-            margin-bottom: 2rem;
-        }
-
-        .chart-title {
-            font-size: 1.2rem;
-            font-weight: bold;
-            color: var(--primary);
-            margin-bottom: 1.5rem;
-            border-bottom: 3px solid var(--accent);
-            padding-bottom: 0.5rem;
-        }
-
-        /* ===== ACTION BUTTONS ===== */
-        .action-buttons {
-            display: flex;
-            gap: 1rem;
-            margin-top: 1.5rem;
-            flex-wrap: wrap;
-        }
-
-        .btn {
-            padding: 0.8rem 1.5rem;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            font-family: inherit;
-            font-size: 0.95rem;
-        }
-
-        .btn-primary {
-            background: var(--accent);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: #a67a1a;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(196, 148, 36, 0.3);
-        }
-
-        .btn-whatsapp {
-            background: #25D366;
-            color: white;
-        }
-
-        .btn-whatsapp:hover {
-            background: #20BA5A;
-            transform: translateY(-2px);
-        }
-
-        .btn-secondary {
+        table th {
             background: var(--light-bg);
-            color: var(--primary);
-            border: 2px solid var(--primary);
+            font-weight: bold;
         }
 
-        .btn-secondary:hover {
-            background: var(--primary);
+        .logout-btn {
+            background: var(--danger);
             color: white;
-        }
-
-        /* ===== LOADING ===== */
-        .loading {
-            text-align: center;
-            padding: 2rem;
-            color: white;
-        }
-
-        .spinner {
-            border: 4px solid rgba(255, 255, 255, 0.2);
-            border-top: 4px solid var(--accent);
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 1rem;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* ===== RESPONSIVE ===== */
-        @media (max-width: 768px) {
-            .login-container {
-                margin: 2rem 1rem;
-            }
-
-            .header-content {
-                flex-direction: column;
-                gap: 1rem;
-            }
-
-            .customer-info {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .tabs {
-                flex-direction: column;
-                border-bottom: none;
-            }
-
-            .tab-btn {
-                border-bottom: none;
-                border-left: 3px solid transparent;
-                padding: 0.8rem 1rem;
-            }
-
-            .tab-btn.active {
-                border-left-color: var(--accent);
-                border-bottom-color: transparent;
-            }
-
-            table {
-                font-size: 0.85rem;
-            }
-
-            th, td {
-                padding: 0.75rem 0.5rem;
-            }
-
-            .action-buttons {
-                flex-direction: column;
-            }
-
-            .btn {
-                width: 100%;
-            }
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
-    <!-- LOGIN PAGE -->
-    <div id="loginPage" style="display: block;">
-        <header>
-            <div class="header-content">
-                <div class="logo">💧 MajiHesabu</div>
-                <div style="text-align: center; color: white; font-size: 0.9rem;">
-                    Joy Water Supplies - Customer Portal
-                </div>
-            </div>
-            <div style="text-align: center; font-size: 0.75rem; margin-top: 0.5rem; opacity: 0.8;">
-                Powered by <strong>Albuk Technologies Ltd</strong> | Empowering Small Businesses Through Practical Technology
-            </div>
-        </header>
+    <header>
+        <div class="logo">💧 MajiHesabu</div>
+        <p style="margin-top: 0.5rem; opacity: 0.9;">Customer Portal</p>
+    </header>
 
-        <div class="login-container">
-            <div class="login-title">Welcome! 👋</div>
-            <div class="login-subtitle">Login to view your water bill account</div>
+    <div class="container">
+        <!-- LOGIN SECTION -->
+        <div id="loginSection">
+            <div class="login-form">
+                <h2 style="margin-bottom: 1.5rem; color: var(--primary);">🔓 Login to Your Account</h2>
+                
+                <div id="loginMessage"></div>
 
-            <div id="loginMessage"></div>
+                <form onsubmit="handleLogin(event)">
+                    <div class="form-group">
+                        <label for="loginPhone">Phone Number <span style="font-size: 0.8rem; color: #999;">(+254 or 0)</span></label>
+                        <input type="tel" id="loginPhone" placeholder="+254700000001 or 0700000001" required>
+                    </div>
 
-            <form class="login-form" onsubmit="handleLogin(event)">
-                <div class="form-group">
-                    <label for="loginPhone">Phone Number <span style="font-size: 0.8rem; color: #999;">(+254 or 0)</span></label>
-                    <input type="tel" id="loginPhone" placeholder="+254700000001 or 0700000001" required>
-                </div>
+                    <div class="form-group">
+                        <label for="loginMeter">Meter Number</label>
+                        <input type="text" id="loginMeter" placeholder="e.g., M-00123" required>
+                    </div>
 
-                <div class="form-group">
-                    <label for="loginMeter">Meter Number</label>
-                    <input type="text" id="loginMeter" placeholder="e.g., M-00123" required>
-                </div>
-
-                <button type="submit" class="login-btn">🔓 Login to Account</button>
-            </form>
-
-            <div style="text-align: center; margin-top: 2rem; padding-top: 2rem; border-top: 1px solid var(--border);">
-                <p style="font-size: 0.85rem; color: #666;">
-                    Don't know your meter number? Check your water meter or contact us at<br>
-                    <strong>+254 768 789 382</strong>
-                </p>
+                    <button type="submit" class="login-btn">🔓 Login to Account</button>
+                </form>
             </div>
         </div>
-    </div>
 
-    <!-- DASHBOARD PAGE -->
-    <div id="dashboardPage" style="display: none;">
-        <header>
-            <div class="header-content">
-                <div class="logo">💧 MajiHesabu</div>
-                <button class="logout-btn" onclick="logout()">🚪 Logout</button>
-            </div>
-            <div style="text-align: center; font-size: 0.75rem; margin-top: 0.5rem; opacity: 0.8;">
-                Powered by <strong>Albuk Technologies Ltd</strong> | Empowering Small Businesses Through Practical Technology
-            </div>
-        </header>
-
-        <div class="container">
-            <!-- Customer Header -->
-            <div class="customer-header">
-                <div class="customer-info">
-                    <div class="customer-details">
-                        <h1 id="customerName">Loading...</h1>
-                        <p>📱 Phone: <span id="customerPhone"></span></p>
-                        <p>📏 Meter: <span id="customerMeter"></span></p>
-                        <p>🏠 Type: <span id="customerType"></span></p>
-                    </div>
-                    <div id="accountStatus" class="account-status">Active ✓</div>
-                </div>
+        <!-- DASHBOARD SECTION (Hidden until login) -->
+        <div id="dashboardSection" class="dashboard">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                <h2 style="color: white;">Welcome, <span id="customerName"></span>!</h2>
+                <button class="logout-btn" onclick="logout()">Logout</button>
             </div>
 
-            <!-- Quick Stats -->
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-label">Total Outstanding</div>
-                    <div class="stat-value" id="totalOutstanding">KES 0</div>
-                </div>
-                <div class="stat-card current">
-                    <div class="stat-label">Current Month</div>
-                    <div class="stat-value" id="currentMonth">KES 0</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">Avg Consumption</div>
-                    <div class="stat-value" id="avgConsumption">0 Units</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">Last Payment</div>
-                    <div class="stat-value" id="lastPayment">-</div>
-                </div>
+            <!-- CUSTOMER INFO -->
+            <div class="info-card">
+                <div class="info-label">Account ID</div>
+                <div class="info-value" id="customerId"></div>
             </div>
 
-            <!-- Tabs -->
+            <div class="info-card">
+                <div class="info-label">Meter Number</div>
+                <div class="info-value" id="customerMeter"></div>
+            </div>
+
+            <div class="info-card">
+                <div class="info-label">Account Type</div>
+                <div class="info-value" id="customerType"></div>
+            </div>
+
+            <!-- TABS -->
             <div class="tabs">
-                <button class="tab-btn active" onclick="switchTab('invoices')">📋 Invoices (6 Months)</button>
-                <button class="tab-btn" onclick="switchTab('payments')">💰 Payments</button>
-                <button class="tab-btn" onclick="switchTab('trends')">📈 Consumption Trends</button>
+                <button class="tab-btn active" onclick="switchTab('invoices')">📋 Invoices</button>
+                <button class="tab-btn" onclick="switchTab('payments')">💳 Payments</button>
+                <button class="tab-btn" onclick="switchTab('trends')">📈 Consumption</button>
             </div>
 
-            <!-- Invoices Tab -->
+            <!-- INVOICES TAB -->
             <div id="invoices" class="tab-content active">
-                <div class="invoices-section">
-                    <div class="section-header">📋 Water Bills - Last 6 Months</div>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Month</th>
-                                <th>Consumption</th>
-                                <th>Bill Amount</th>
-                                <th>Paid</th>
-                                <th>Balance</th>
-                                <th>Status</th>
-                                <th>Due Date</th>
-                            </tr>
-                        </thead>
-                        <tbody id="invoicesList">
-                            <tr><td colspan="7" class="empty-message">Loading invoices...</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <div class="action-buttons">
-                    <button class="btn btn-primary" onclick="downloadStatement()">📥 Download Statement</button>
-                    <button class="btn btn-whatsapp" onclick="sendViaWhatsApp()">📱 Send via WhatsApp</button>
-                    <button class="btn btn-secondary" onclick="promiseToPay()">✍️ Promise to Pay</button>
-                </div>
+                <h3 style="margin-bottom: 1rem;">Recent Invoices</h3>
+                <div id="invoicesList">Loading invoices...</div>
             </div>
 
-            <!-- Payments Tab -->
+            <!-- PAYMENTS TAB -->
             <div id="payments" class="tab-content">
-                <div class="invoices-section">
-                    <div class="section-header">💰 Payment History</div>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Date</th>
-                                <th>Amount</th>
-                                <th>Method</th>
-                                <th>Invoice</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody id="paymentsList">
-                            <tr><td colspan="5" class="empty-message">Loading payments...</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <div class="action-buttons">
-                    <button class="btn btn-primary" onclick="makePayment()">💳 Make Payment</button>
-                </div>
+                <h3 style="margin-bottom: 1rem;">Payment History</h3>
+                <div id="paymentsList">Loading payments...</div>
             </div>
 
-            <!-- Trends Tab -->
+            <!-- TRENDS TAB -->
             <div id="trends" class="tab-content">
-                <div class="chart-container">
-                    <div class="chart-title">📈 Consumption Trends (Last 6 Months)</div>
-                    <div id="trendsContent">
-                        <div class="empty-message">Loading consumption data...</div>
-                    </div>
-                </div>
-
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-label">Total Consumption</div>
-                        <div class="stat-value" id="totalConsumption">0 Units</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-label">Peak Month</div>
-                        <div class="stat-value" id="peakMonth">-</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-label">Lowest Usage</div>
-                        <div class="stat-value" id="lowestMonth">-</div>
-                    </div>
-                </div>
+                <h3 style="margin-bottom: 1rem;">Consumption Trends</h3>
+                <div id="trendsList">Loading trends...</div>
             </div>
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        // Configuration
-        const SCRIPT_URL = "YOUR_DEPLOYED_GAS_URL_HERE"; // Replace with deployed URL
+        // ✅ CRITICAL: Make sure SCRIPT_URL is set from config.js
+        const SCRIPT_URL = (typeof CONFIG !== 'undefined' && CONFIG.API_ENDPOINT) 
+            ? CONFIG.API_ENDPOINT 
+            : null;
+
+        console.log("🚀 Customer Portal loaded");
+        console.log("CONFIG loaded:", typeof CONFIG !== 'undefined');
+        console.log("SCRIPT_URL:", SCRIPT_URL);
+
+        // Store current customer
         let currentCustomer = null;
 
-        // ===== AUTHENTICATION =====
-        async function handleLogin(e) {
-            e.preventDefault();
-            const msgDiv = document.getElementById('loginMessage');
+        // Handle Login
+        async function handleLogin(event) {
+            event.preventDefault();
+
             const phone = document.getElementById('loginPhone').value;
             const meterNumber = document.getElementById('loginMeter').value;
 
-            msgDiv.innerHTML = '<div class="login-message info">🔄 Logging in...</div>';
+            console.log("🔐 Attempting login with:", { phone, meterNumber });
+            console.log("Using API URL:", SCRIPT_URL);
+
+            if (!SCRIPT_URL) {
+                showLoginMessage("❌ Configuration error: API endpoint not set", true);
+                return;
+            }
 
             try {
                 const response = await fetch(SCRIPT_URL, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'text/plain;charset=utf-8'
-                    },
-                    body: JSON.stringify({ action: 'authenticate', phone: phone, meterNumber: meterNumber })
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify({ 
+                        action: 'authenticate', 
+                        phone: phone, 
+                        meterNumber: meterNumber 
+                    })
                 });
+
                 const text = await response.text();
-                
+                console.log("Response status:", response.status);
+                console.log("Response text:", text.substring(0, 200));
+
                 if (text.trim().startsWith('<')) {
-                    throw new Error("Server error - returned HTML");
+                    throw new Error("Server returned HTML error (405 or similar)");
                 }
-                
+
                 const result = JSON.parse(text);
+                console.log("Login result:", result);
 
                 if (result.authenticated) {
                     currentCustomer = result;
-                    sessionStorage.setItem('customer', JSON.stringify(result));
-                    loadDashboard();
-                    showDashboard();
+                    showCustomerDashboard();
+                    showLoginMessage("", false);
                 } else {
-                    msgDiv.innerHTML = '<div class="login-message error">❌ Invalid phone number or meter number. Please try again.</div>';
+                    showLoginMessage("❌ Invalid phone or meter number", true);
                 }
             } catch (err) {
-                msgDiv.innerHTML = '<div class="login-message error">❌ Connection error. Please try again.</div>';
+                console.error('Login error:', err);
+                showLoginMessage("❌ Connection error. " + err.message, true);
             }
         }
 
-        function logout() {
-            sessionStorage.removeItem('customer');
-            currentCustomer = null;
-            document.getElementById('loginPage').style.display = 'block';
-            document.getElementById('dashboardPage').style.display = 'none';
-            document.getElementById('loginPhone').value = '';
-            document.getElementById('loginMeter').value = '';
+        function showLoginMessage(message, isError) {
+            const el = document.getElementById('loginMessage');
+            if (message) {
+                el.innerHTML = `<div class="message ${isError ? 'error' : 'success'}">${message}</div>`;
+            } else {
+                el.innerHTML = '';
+            }
         }
 
-        // ===== PAGE NAVIGATION =====
-        function showDashboard() {
-            document.getElementById('loginPage').style.display = 'none';
-            document.getElementById('dashboardPage').style.display = 'block';
-        }
+        function showCustomerDashboard() {
+            document.getElementById('loginSection').style.display = 'none';
+            document.getElementById('dashboardSection').classList.add('active');
 
-        function switchTab(tabName) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById('customerId').innerText = currentCustomer.customerId;
+            document.getElementById('customerName').innerText = currentCustomer.name;
+            document.getElementById('customerMeter').innerText = currentCustomer.meterNumber;
+            document.getElementById('customerType').innerText = currentCustomer.type;
 
-            document.getElementById(tabName).classList.add('active');
-            event.target.classList.add('active');
-
-            if (tabName === 'invoices') loadInvoices();
-            if (tabName === 'payments') loadPayments();
-            if (tabName === 'trends') loadTrends();
-        }
-
-        // ===== LOAD DATA =====
-        async function loadDashboard() {
-            if (!currentCustomer) return;
-
-            // Display customer info
-            document.getElementById('customerName').textContent = currentCustomer.name;
-            document.getElementById('customerPhone').textContent = currentCustomer.phone;
-            document.getElementById('customerMeter').textContent = currentCustomer.meterNumber;
-            document.getElementById('customerType').textContent = currentCustomer.type;
-
-            // Load invoices and calculate stats
-            await loadInvoices();
+            loadInvoices();
+            loadPayments();
+            loadTrends();
         }
 
         async function loadInvoices() {
-            if (!currentCustomer) return;
-
             try {
                 const response = await fetch(SCRIPT_URL, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'text/plain;charset=utf-8'
-                    },
-                    body: JSON.stringify({ action: 'getInvoiceHistory', customerId: currentCustomer.customerId, months: 6 })
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify({ 
+                        action: 'getInvoiceHistory', 
+                        customerId: currentCustomer.customerId, 
+                        months: 6 
+                    })
                 });
+
                 const text = await response.text();
-                
-                if (text.trim().startsWith('<')) {
-                    throw new Error("Server error - returned HTML");
-                }
-                
-                const invoices = JSON.parse(text).invoices || [];
+                if (text.trim().startsWith('<')) throw new Error("Server error");
 
-                const tbody = document.getElementById('invoicesList');
-                tbody.innerHTML = '';
+                const data = JSON.parse(text);
+                const invoices = data.invoices || data.success ? data.invoices : [];
 
-                if (invoices.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="7" class="empty-message">No invoices found</td></tr>';
-                    return;
-                }
-
-                let totalOutstanding = 0;
-                let avgConsumption = 0;
-
-                invoices.forEach(inv => {
-                    totalOutstanding += inv.balance;
-                    avgConsumption += inv.consumption;
-
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td><strong>${inv.month}</strong></td>
-                        <td>${inv.consumption} units</td>
-                        <td class="amount">KES ${formatCurrency(inv.amount)}</td>
-                        <td class="amount" style="color: var(--success);">KES ${formatCurrency(inv.paidAmount)}</td>
-                        <td class="amount" style="color: var(--danger);">KES ${formatCurrency(inv.balance)}</td>
-                        <td><span class="status-badge ${getStatusClass(inv.status)}">${inv.status}</span></td>
-                        <td>${new Date(inv.dueDate).toLocaleDateString()}</td>
+                const listEl = document.getElementById('invoicesList');
+                if (invoices.length > 0) {
+                    listEl.innerHTML = `
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Month</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${invoices.map(inv => `
+                                    <tr>
+                                        <td>${inv.month}</td>
+                                        <td>KES ${(inv.totalAmount || 0).toLocaleString()}</td>
+                                        <td>${inv.status}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
                     `;
-                    tbody.appendChild(row);
-                });
-
-                // Update stats
-                document.getElementById('totalOutstanding').textContent = `KES ${formatCurrency(totalOutstanding)}`;
-                document.getElementById('currentMonth').textContent = `KES ${formatCurrency(invoices[0]?.amount || 0)}`;
-                document.getElementById('avgConsumption').textContent = `${Math.round(avgConsumption / invoices.length)} Units`;
+                } else {
+                    listEl.innerHTML = '<p style="text-align: center; color: #999;">No invoices found</p>';
+                }
             } catch (err) {
-                document.getElementById('invoicesList').innerHTML = '<tr><td colspan="7" class="empty-message">Error loading invoices</td></tr>';
+                console.error('Invoices error:', err);
+                document.getElementById('invoicesList').innerHTML = '<p style="color: red;">Error loading invoices</p>';
             }
         }
 
         async function loadPayments() {
-            if (!currentCustomer) return;
-
             try {
                 const response = await fetch(SCRIPT_URL, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'text/plain;charset=utf-8'
-                    },
-                    body: JSON.stringify({ action: 'getPaymentHistory', customerId: currentCustomer.customerId })
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify({ 
+                        action: 'getPaymentHistory', 
+                        customerId: currentCustomer.customerId 
+                    })
                 });
+
                 const text = await response.text();
-                
-                if (text.trim().startsWith('<')) {
-                    throw new Error("Server error - returned HTML");
-                }
-                
-                const payments = JSON.parse(text).payments || [];
+                if (text.trim().startsWith('<')) throw new Error("Server error");
 
-                const tbody = document.getElementById('paymentsList');
-                tbody.innerHTML = '';
+                const data = JSON.parse(text);
+                const payments = data.payments || [];
 
-                if (payments.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="5" class="empty-message">No payments recorded</td></tr>';
-                    return;
-                }
-
-                payments.forEach(pay => {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td>${new Date(pay.paymentDate).toLocaleDateString()}</td>
-                        <td class="amount">KES ${formatCurrency(pay.amount)}</td>
-                        <td>${pay.paymentMethod}</td>
-                        <td><code>${pay.invoiceId}</code></td>
-                        <td><span class="status-badge paid">${pay.status}</span></td>
-                    `;
-                    tbody.appendChild(row);
-                });
-
-                // Update last payment
+                const listEl = document.getElementById('paymentsList');
                 if (payments.length > 0) {
-                    document.getElementById('lastPayment').textContent = new Date(payments[0].paymentDate).toLocaleDateString();
+                    listEl.innerHTML = `
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Amount</th>
+                                    <th>Method</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${payments.map(pay => `
+                                    <tr>
+                                        <td>${pay.paymentDate}</td>
+                                        <td>KES ${(pay.amount || 0).toLocaleString()}</td>
+                                        <td>${pay.method}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    `;
+                } else {
+                    listEl.innerHTML = '<p style="text-align: center; color: #999;">No payments found</p>';
                 }
             } catch (err) {
-                document.getElementById('paymentsList').innerHTML = '<tr><td colspan="5" class="empty-message">Error loading payments</td></tr>';
+                console.error('Payments error:', err);
+                document.getElementById('paymentsList').innerHTML = '<p style="color: red;">Error loading payments</p>';
             }
         }
 
         async function loadTrends() {
-            if (!currentCustomer) return;
-
             try {
                 const response = await fetch(SCRIPT_URL, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'text/plain;charset=utf-8'
-                    },
-                    body: JSON.stringify({ action: 'getConsumptionTrends', customerId: currentCustomer.customerId, months: 6 })
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify({ 
+                        action: 'getConsumptionTrends', 
+                        customerId: currentCustomer.customerId, 
+                        months: 6 
+                    })
                 });
+
                 const text = await response.text();
-                
-                if (text.trim().startsWith('<')) {
-                    throw new Error("Server error - returned HTML");
+                if (text.trim().startsWith('<')) throw new Error("Server error");
+
+                const data = JSON.parse(text);
+                const trends = data.trends || [];
+
+                const listEl = document.getElementById('trendsList');
+                if (trends.length > 0) {
+                    listEl.innerHTML = `
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Month</th>
+                                    <th>Consumption (units)</th>
+                                    <th>Amount (KES)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${trends.map(trend => `
+                                    <tr>
+                                        <td>${trend.month}</td>
+                                        <td>${trend.consumption}</td>
+                                        <td>KES ${(trend.amount || 0).toLocaleString()}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    `;
+                } else {
+                    listEl.innerHTML = '<p style="text-align: center; color: #999;">No trends found</p>';
                 }
-                
-                const trends = JSON.parse(text).trends || [];
-
-                if (trends.length === 0) {
-                    document.getElementById('trendsContent').innerHTML = '<div class="empty-message">No consumption data available</div>';
-                    return;
-                }
-
-                const labels = trends.map(t => t.month);
-                const data = trends.map(t => t.consumption);
-
-                const ctx = document.createElement('canvas');
-                document.getElementById('trendsContent').innerHTML = '';
-                document.getElementById('trendsContent').appendChild(ctx);
-
-                new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: labels,
-                        datasets: [{
-                            label: 'Consumption (Units)',
-                            data: data,
-                            borderColor: 'var(--accent)',
-                            backgroundColor: 'rgba(196, 148, 36, 0.1)',
-                            borderWidth: 2,
-                            fill: true,
-                            tension: 0.4,
-                            pointRadius: 5,
-                            pointBackgroundColor: 'var(--accent)'
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        plugins: {
-                            legend: { display: false }
-                        },
-                        scales: {
-                            y: { beginAtZero: true }
-                        }
-                    }
-                });
-
-                // Update trend stats
-                const totalConsumption = data.reduce((a, b) => a + b, 0);
-                const maxMonth = labels[data.indexOf(Math.max(...data))];
-                const minMonth = labels[data.indexOf(Math.min(...data))];
-
-                document.getElementById('totalConsumption').textContent = `${totalConsumption} Units`;
-                document.getElementById('peakMonth').textContent = maxMonth;
-                document.getElementById('lowestMonth').textContent = minMonth;
             } catch (err) {
-                document.getElementById('trendsContent').innerHTML = '<div class="empty-message">Error loading trends</div>';
+                console.error('Trends error:', err);
+                document.getElementById('trendsList').innerHTML = '<p style="color: red;">Error loading trends</p>';
             }
         }
 
-        // ===== ACTIONS =====
-        function downloadStatement() {
-            alert('📥 Statement download feature coming soon!\n\nYou can screenshot this page for now.');
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+            event.target.classList.add('active');
+            document.getElementById(tabName).classList.add('active');
         }
 
-        function sendViaWhatsApp() {
-            if (currentCustomer) {
-                const phone = currentCustomer.phone.replace(/\D/g, '');
-                const message = `Hi, I'd like to receive my water bill via WhatsApp. Phone: ${currentCustomer.phone}, Meter: ${currentCustomer.meterNumber}`;
-                window.open(`https://wa.me/254768789382?text=${encodeURIComponent(message)}`, '_blank');
-            }
+        function logout() {
+            currentCustomer = null;
+            document.getElementById('loginSection').style.display = 'block';
+            document.getElementById('dashboardSection').classList.remove('active');
+            document.getElementById('loginPhone').value = '';
+            document.getElementById('loginMeter').value = '';
         }
-
-        function promiseToPay() {
-            const amount = prompt('Enter amount you promise to pay (KES):');
-            if (amount) {
-                alert(`✅ Thank you for your promise to pay KES ${amount}\n\nOur team will follow up within 24 hours.`);
-            }
-        }
-
-        function makePayment() {
-            alert('💳 Payment integration coming soon!\n\nFor now, pay via M-Pesa Till: 4984254\n\nSend confirmation screenshot via WhatsApp to +254 768 789 382');
-        }
-
-        // ===== UTILITIES =====
-        function formatCurrency(value) {
-            return new Intl.NumberFormat('en-KE').format(value);
-        }
-
-        function getStatusClass(status) {
-            if (status === 'Paid') return 'paid';
-            if (status === 'PartiallyPaid') return 'partial';
-            return 'unpaid';
-        }
-
-        // Check if already logged in
-        window.addEventListener('load', () => {
-            const saved = sessionStorage.getItem('customer');
-            if (saved) {
-                currentCustomer = JSON.parse(saved);
-                loadDashboard();
-                showDashboard();
-            }
-        });
     </script>
 </body>
 </html>
