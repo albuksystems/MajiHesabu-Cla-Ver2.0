@@ -17,7 +17,7 @@ if (typeof root.CONFIG === 'undefined') {
   root.CONFIG = {
     // ✅ Deployed Apps Script URL
     API_ENDPOINT: "https://script.google.com/macros/s/AKfycbwpK9chdjn0UvkLLQq8u7H1DpLGep7SMSPYtxp41_hjvOIlydqRjfQYzPh6OXNzUSnd/exec",
-
+                  
     // ============================================================================
     // COMPANY INFORMATION
     // ============================================================================
