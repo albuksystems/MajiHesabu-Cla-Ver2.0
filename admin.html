@@ -662,55 +662,51 @@
         // ==========================================
         // CUSTOMERS LIST
         // ==========================================
-        async function loadCustomers() {
-            try {
-                const response = await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                    body: JSON.stringify({ action: 'getAllCustomersWithStatus' })
-                });
+        // 1. Declare at the top of your <script> section (or right above loadCustomers)
+let globalCustomersList = [];
 
-                const text = await response.text();
-                if (text.trim().startsWith('<')) throw new Error("Server error");
+// 2. Replace your existing loadCustomers function (around lines 674-710)
+async function loadCustomers() {
+  try {
+    const response = await fetch(SCRIPT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ action: 'loadCustomers' })
+    });
+    
+    const result = await response.json();
+    
+    if (result.success || result.data) {
+      globalCustomersList = result.data || result;
+      populateCustomerDropdown(globalCustomersList);
+    } else {
+      console.error('Failed to load customers:', result.message);
+    }
+  } catch (err) {
+    console.error('Error loading customers:', err);
+  }
+}
 
-                const data = JSON.parse(text);
-                const listEl = document.getElementById('customersList');
-
-                if (data.success && data.customers && data.customers.length > 0) {
-                    listEl.innerHTML = `
-                        <table class="debtors-table">
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Name</th>
-                                    <th>Phone</th>
-                                    <th>Type</th>
-                                    <th>Meter</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                ${data.customers.map(c => `
-                                    <tr>
-                                        <td><small>${c.customerId}</small></td>
-                                        <td>${c.name}</td>
-                                        <td>${c.phone}</td>
-                                        <td>${c.type}</td>
-                                        <td>${c.meterNumber}</td>
-                                        <td><span style="color: var(--accent-green); font-weight: bold;">${c.status || 'Active'}</span></td>
-                                    </tr>
-                                `).join('')}
-                            </tbody>
-                        </table>
-                    `;
-                } else {
-                    listEl.innerHTML = '<p style="text-align: center; padding: 2rem; color: var(--text-muted);">No customers found</p>';
-                }
-            } catch (err) {
-                console.error('Customers error:', err);
-            }
-        }
-
+// 3. Add this right below loadCustomers
+function onCustomerSelectChange() {
+  const selectElement = document.getElementById('customerSelect');
+  const selectedCustomerId = selectElement.value;
+  
+  const customer = globalCustomersList.find(c => c.id === selectedCustomerId);
+  
+  const prevInput = document.getElementById('prevReadingInput');
+  if (prevInput) {
+    if (customer && customer.lastReading !== undefined) {
+      prevInput.value = customer.lastReading;
+    } else {
+      prevInput.value = 0;
+    }
+  }
+  
+  if (typeof calculateConsumption === 'function') {
+    calculateConsumption();
+  }
+}
         // ==========================================
         // METER READING
         // ==========================================
