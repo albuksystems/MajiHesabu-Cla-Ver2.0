@@ -666,86 +666,71 @@
 let globalCustomersList = [];
 
 // 2. Replace your existing loadCustomers function (around lines 674-710)
+// Global customer registry
+let globalCustomersList = [];
+
+// 1. Corrected loadCustomers (POST request via text/plain to avoid CORS preflight)
 async function loadCustomers() {
   try {
     const response = await fetch(SCRIPT_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify({ action: 'loadCustomers' })
+      body: JSON.stringify({ action: 'getCustomers' }) // Ensure action matches Code.gs ('getCustomers' or 'loadCustomers')
     });
     
     const result = await response.json();
     
-    if (result.success || result.data) {
-      globalCustomersList = result.data || result;
+    if (result.success && Array.isArray(result.data)) {
+      globalCustomersList = result.data;
       populateCustomerDropdown(globalCustomersList);
     } else {
-      console.error('Failed to load customers:', result.message);
+      console.error('Failed to load customers:', result.message || result);
     }
   } catch (err) {
-    console.error('Error loading customers:', err);
+    console.error('Error in loadCustomers:', err);
   }
-}
-
-// 3. Add this right below loadCustomers
-function onCustomerSelectChange() {
-  const selectElement = document.getElementById('customerSelect');
-  const selectedCustomerId = selectElement.value;
-  
-  const customer = globalCustomersList.find(c => c.id === selectedCustomerId);
-  
-  const prevInput = document.getElementById('prevReadingInput');
-  if (prevInput) {
-    if (customer && customer.lastReading !== undefined) {
-      prevInput.value = customer.lastReading;
-    } else {
-      prevInput.value = 0;
-    }
-  }
-  
-  if (typeof calculateConsumption === 'function') {
-    calculateConsumption();
-  }
-}
-        // ==========================================
+}        // ==========================================
         // METER READING
         // ==========================================
         async function recordReading(event) {
-            event.preventDefault();
+  if (event) event.preventDefault();
+  
+  const customerId = document.getElementById('customerSelect').value;
+  const reading = document.getElementById('currentReadingInput').value;
+  
+  if (!customerId || !reading) {
+    alert("Please select a customer and enter a meter reading.");
+    return;
+  }
 
-            const payload = {
-                action: 'recordMeterReading',
-                meterNumber: document.getElementById('readMeter').value,
-                readingValue: document.getElementById('readingValue').value,
-                readingDate: document.getElementById('readingDate').value,
-                recordedBy: document.getElementById('recordedBy').value
-            };
+  const payload = {
+    action: 'recordMeterReading',
+    customerId: customerId,
+    reading: reading,
+    recordedBy: 'Admin'
+  };
 
-            try {
-                const response = await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                    body: JSON.stringify(payload)
-                });
+  try {
+    const response = await fetch(SCRIPT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(payload)
+    });
 
-                const text = await response.text();
-                if (text.trim().startsWith('<')) throw new Error("Server returned HTML");
+    const result = await response.json();
 
-                const result = JSON.parse(text);
-
-                if (result.success) {
-                    showMessage('meter-reading-message', `✅ Reading recorded successfully! Invoice generated.`);
-                    event.target.reset();
-                    loadDashboard();
-                } else {
-                    showMessage('meter-reading-message', '❌ ' + (result.message || 'Error'), true);
-                }
-            } catch (err) {
-                console.error('Error:', err);
-                showMessage('meter-reading-message', '❌ ' + err.message, true);
-            }
-        }
-
+    if (result.success) {
+      alert(`✅ ${result.message}\nInvoice ID: ${result.invoiceId}`);
+      // Refresh list to update previous readings baseline
+      loadCustomers();
+    } else {
+      alert(`❌ Error: ${result.message}`);
+    }
+  } catch (err) {
+    console.error('Error in recordReading:', err);
+    alert('Server returned an unexpected response. Check Google Apps Script deployment.');
+  }
+}
         // ==========================================
         // WHATSAPP MODAL LOGIC
         // ==========================================
