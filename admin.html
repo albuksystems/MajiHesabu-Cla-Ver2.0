@@ -222,19 +222,6 @@
             background: #f5f5f5;
         }
 
-        .consumption-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 1.5rem;
-        }
-
-        .consumption-card {
-            background: white;
-            padding: 1.5rem;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-        }
-
         .action-btn {
             background: var(--accent);
             color: white;
@@ -243,6 +230,7 @@
             border-radius: 6px;
             cursor: pointer;
             font-size: 0.85rem;
+            font-weight: bold;
         }
 
         .action-btn.whatsapp {
@@ -265,11 +253,11 @@
 
     <div class="container">
         <div class="tabs">
-            <button class="tab-btn active" onclick="switchTab('dashboard')">📊 Dashboard</button>
-            <button class="tab-btn" onclick="switchTab('debtors')">💳 Debtors</button>
-            <button class="tab-btn" onclick="switchTab('add-customer')">➕ New Customer</button>
-            <button class="tab-btn" onclick="switchTab('customers')">👥 Customers</button>
-            <button class="tab-btn" onclick="switchTab('meter-reading')">📏 Meter Reading</button>
+            <button class="tab-btn active" onclick="switchTab('dashboard', event)">📊 Dashboard</button>
+            <button class="tab-btn" onclick="switchTab('debtors', event)">💳 Debtors</button>
+            <button class="tab-btn" onclick="switchTab('add-customer', event)">➕ New Customer</button>
+            <button class="tab-btn" onclick="switchTab('customers', event)">👥 Customers</button>
+            <button class="tab-btn" onclick="switchTab('meter-reading', event)">📏 Meter Reading</button>
         </div>
 
         <!-- DASHBOARD TAB -->
@@ -417,16 +405,83 @@
         </div>
     </div>
 
+    <!-- ═══ WHATSAPP MODAL ═══ -->
+    <div class="modal-overlay" id="waModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 1000; align-items: center; justify-content: center;">
+        <div class="modal-box" style="position: relative; max-height: 85vh; overflow-y: auto; background: white; border-radius: 12px; padding: 2rem; max-width: 500px; box-shadow: 0 10px 40px rgba(0,0,0,0.3);">
+            
+            <!-- Close Button -->
+            <button class="modal-close" onclick="closeWaModal()" style="position: absolute; top: 1rem; right: 1rem; background: none; border: none; font-size: 2rem; cursor: pointer; color: #999;">×</button>
+            
+            <!-- Modal Title -->
+            <div class="modal-title" style="font-size: 1.5rem; font-weight: bold; color: #1a3a3a; margin-bottom: 0.5rem;">Send via WhatsApp</div>
+            <div class="modal-sub" style="font-size: 0.9rem; color: #666; margin-bottom: 1.5rem;">Review message before sending</div>
+            
+            <!-- Message Type Selector -->
+            <div style="margin-bottom: 1.5rem;">
+                <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; color: #1a3a3a;">Message Type</label>
+                <select class="form-select" id="waMsgType" onchange="generateWaMessage()" style="width: 100%; padding: 0.8rem; border: 1px solid #ddd; border-radius: 6px; font-family: inherit; background: white; cursor: pointer;">
+                    <option value="invoice">📋 Invoice</option>
+                    <option value="reminder">🔔 Payment Reminder</option>
+                    <option value="receipt">✅ Payment Receipt</option>
+                    <option value="alert">⚠️ Alert Notice</option>
+                    <option value="welcome">👋 Welcome Message</option>
+                </select>
+            </div>
+            
+            <!-- Company Info Block -->
+            <div class="mpesa-block" style="background: #f5f5f5; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; display: flex; gap: 1rem; align-items: center;">
+                <div class="mpesa-icon" style="width: 50px; height: 50px; background: #C49424; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.5rem; color: white;">J</div>
+                <div>
+                    <div style="font-weight: bold; color: #1a3a3a;">Joy Water Supplies</div>
+                    <div style="font-size: 0.85rem; color: #666;">Phone: +254768789382</div>
+                    <div style="font-size: 0.85rem; color: #666;">Mlolongo, Kenya</div>
+                </div>
+            </div>
+            
+            <!-- Message Preview -->
+            <div style="background: #e8f5e9; padding: 1rem; border-radius: 12px; margin-bottom: 1.5rem; min-height: 100px;">
+                <div class="wa-bubble" id="waMessageText" style="background: #dcf8c6; padding: 0.8rem; border-radius: 8px; word-wrap: break-word; font-size: 0.95rem; line-height: 1.5; color: #1a3a3a;">
+                    Loading message...
+                </div>
+                <div class="wa-time" id="waTime" style="text-align: right; font-size: 0.75rem; color: #999; margin-top: 0.5rem;">
+                    12:30 PM
+                </div>
+            </div>
+            
+            <!-- Customer Info -->
+            <div style="background: #f5f5f5; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; font-size: 0.9rem;">
+                <div><strong>To:</strong> <span id="waCustomerPhone"></span></div>
+                <div><strong>Customer:</strong> <span id="waCustomerName"></span></div>
+                <div><strong>Amount:</strong> KES <span id="waAmount">0</span></div>
+            </div>
+            
+            <!-- Action Buttons -->
+            <button class="btn btn-green" style="width: 100%; padding: 1rem; background: #25D366; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 1rem; margin-bottom: 0.8rem;" onclick="openWhatsApp()">
+                📲 Open in WhatsApp
+            </button>
+            
+            <button class="btn btn-outline" style="width: 100%; padding: 1rem; background: white; color: #1a3a3a; border: 2px solid #C49424; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 1rem; margin-bottom: 0.8rem;" onclick="copyWaMessage()">
+                📋 Copy Message
+            </button>
+            
+            <button class="btn btn-secondary" style="width: 100%; padding: 1rem; background: #f5f5f5; color: #1a3a3a; border: 1px solid #ddd; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 1rem;" onclick="closeWaModal()">
+                ✕ Close
+            </button>
+        </div>
+    </div>
+
     <script>
         // Use CONFIG from config.js
         const SCRIPT_URL = (typeof CONFIG !== 'undefined') ? CONFIG.API_ENDPOINT : "YOUR_DEPLOYED_GAS_URL_HERE";
         console.log("🚀 Dashboard loaded. API URL:", SCRIPT_URL);
 
-        function switchTab(tabName) {
+        function switchTab(tabName, event) {
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
 
-            event.target.classList.add('active');
+            if (event && event.target) {
+                event.target.classList.add('active');
+            }
             document.getElementById(tabName).classList.add('active');
 
             if (tabName === 'dashboard') loadDashboard();
@@ -441,13 +496,13 @@
             setTimeout(() => { el.innerHTML = ''; }, 5000);
         }
 
-        // ✅ DASHBOARD - Correct action name
+        // DASHBOARD
         async function loadDashboard() {
             try {
                 const response = await fetch(SCRIPT_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                    body: JSON.stringify({ action: 'getDashboard' })  // ✅ CORRECT
+                    body: JSON.stringify({ action: 'getDashboard' })
                 });
 
                 const text = await response.text();
@@ -466,12 +521,12 @@
             }
         }
 
-        // ✅ ADD CUSTOMER - Correct action name
+        // ADD CUSTOMER
         async function addCustomer(event) {
             event.preventDefault();
 
             const payload = {
-                action: 'createCustomer',  // ✅ CHANGED from 'addCustomer'
+                action: 'createCustomer',
                 phone: document.getElementById('phone').value,
                 name: document.getElementById('name').value,
                 type: document.getElementById('type').value,
@@ -505,13 +560,13 @@
             }
         }
 
-        // ✅ DEBTORS - Correct action name
+        // DEBTORS
         async function loadDebtors() {
             try {
                 const response = await fetch(SCRIPT_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                    body: JSON.stringify({ action: 'getDebtors' })  // ✅ CORRECT (not getDebtorsReport)
+                    body: JSON.stringify({ action: 'getDebtors' })
                 });
 
                 const text = await response.text();
@@ -530,9 +585,14 @@
                             <td style="color: #ff6b6b; font-weight: bold;">KES ${(d.amountDue || 0).toLocaleString()}</td>
                             <td>${d.invoiceId}</td>
                             <td>
-                                <a href="https://wa.me/${d.phone.replace(/[^0-9]/g, '')}" target="_blank">
-                                    <button class="action-btn whatsapp">💬</button>
-                                </a>
+                                <button class="action-btn whatsapp" onclick="openWaModal(
+                                    '${d.phone}',
+                                    '${d.name.replace(/'/g, "\\'")}',
+                                    ${d.amountDue || 0},
+                                    '${d.invoiceId}',
+                                    '${d.meterNumber || ''}',
+                                    'Overdue'
+                                )">📱 WhatsApp</button>
                             </td>
                         </tr>
                     `).join('');
@@ -544,13 +604,13 @@
             }
         }
 
-        // ✅ CUSTOMERS LIST - Correct action name
+        // CUSTOMERS LIST
         async function loadCustomers() {
             try {
                 const response = await fetch(SCRIPT_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                    body: JSON.stringify({ action: 'getAllCustomersWithStatus' })  // ✅ CORRECT
+                    body: JSON.stringify({ action: 'getAllCustomersWithStatus' })
                 });
 
                 const text = await response.text();
@@ -594,14 +654,15 @@
             }
         }
 
-        // ✅ METER READING - Correct action name
+        // METER READING
         async function recordReading(event) {
             event.preventDefault();
 
             const payload = {
-                action: 'recordMeterReading',  // ✅ CORRECT (not recordReading)
+                action: 'recordMeterReading',
                 meterNumber: document.getElementById('readMeter').value,
-                reading: document.getElementById('readingValue').value,
+                readingValue: document.getElementById('readingValue').value,
+                readingDate: document.getElementById('readingDate').value,
                 recordedBy: document.getElementById('recordedBy').value
             };
 
@@ -613,35 +674,175 @@
                 });
 
                 const text = await response.text();
-                if (text.trim().startsWith('<')) throw new Error("Server error");
+                if (text.trim().startsWith('<')) throw new Error("Server returned HTML");
 
                 const result = JSON.parse(text);
 
                 if (result.success) {
-                    showMessage('meter-reading-message', '✅ Meter reading recorded successfully!');
+                    showMessage('meter-reading-message', `✅ Reading recorded successfully! Invoice generated.`);
                     event.target.reset();
                     loadDashboard();
                 } else {
                     showMessage('meter-reading-message', '❌ ' + (result.message || 'Error'), true);
                 }
             } catch (err) {
+                console.error('Error:', err);
                 showMessage('meter-reading-message', '❌ ' + err.message, true);
             }
         }
 
-        // Set date picker to today
-        window.onload = () => {
-            const dateInput = document.getElementById('readingDate');
-            if (dateInput) {
-                dateInput.value = new Date().toISOString().split('T')[0];
-            }
-            loadDashboard();
+        // ══════════════════════════════════════════════════════════════
+        // WHATSAPP MODAL LOGIC
+        // ══════════════════════════════════════════════════════════════
+        let currentWaData = {
+            phone: "",
+            name: "",
+            amount: 0,
+            invoiceId: "",
+            meterNumber: "",
+            status: ""
         };
+
+        function openWaModal(phone, name, amount, invoiceId, meterNumber, status) {
+            currentWaData = {
+                phone: phone || "+254768789382",
+                name: name || "Valued Customer",
+                amount: amount || 0,
+                invoiceId: invoiceId || "INV-000",
+                meterNumber: meterNumber || "M-00000",
+                status: status || "Unpaid"
+            };
+
+            document.getElementById('waCustomerPhone').innerText = currentWaData.phone;
+            document.getElementById('waCustomerName').innerText = currentWaData.name;
+            document.getElementById('waAmount').innerText = currentWaData.amount.toLocaleString();
+
+            generateWaMessage();
+            document.getElementById('waModal').style.display = 'flex';
+        }
+
+        function closeWaModal() {
+            document.getElementById('waModal').style.display = 'none';
+        }
+
+        function generateWaMessage() {
+            const msgType = document.getElementById('waMsgType').value;
+            const { name, amount, invoiceId, meterNumber } = currentWaData;
+            
+            let message = "";
+
+            switch(msgType) {
+                case 'invoice':
+                    message = `*📋 WATER BILL NOTIFICATION*
+
+Hello ${name},
+
+Your invoice for water services is ready:
+*Invoice ID:* ${invoiceId}
+*Meter Number:* ${meterNumber}
+*Amount Due:* KES ${amount.toLocaleString()}
+*Due Date:* Within 15 days
+
+*Pay via M-Pesa Till:* 4984254
+*Business Name:* Joy Water Supplies
+
+Thank you for being a valued customer! 🙏`;
+                    break;
+
+                case 'reminder':
+                    message = `*🔔 PAYMENT REMINDER*
+
+Hello ${name},
+
+This is a friendly reminder that your water bill is due:
+*Invoice ID:* ${invoiceId}
+*Amount Due:* KES ${amount.toLocaleString()}
+
+Please pay via M-Pesa Till: *4984254*
+Account Name: Joy Water Supplies
+
+Thank you! 💧`;
+                    break;
+
+                case 'receipt':
+                    message = `*✅ PAYMENT RECEIVED*
+
+Hello ${name},
+
+Thank you for your payment! 🙏
+*Invoice ID:* ${invoiceId}
+*Amount Paid:* KES ${amount.toLocaleString()}
+*Date:* ${new Date().toLocaleDateString()}
+
+Your account is now up to date.
+For any issues, contact us at +254768789382`;
+                    break;
+
+                case 'alert':
+                    message = `*⚠️ URGENT: BILL ALERT*
+
+Hello ${name},
+
+Your water bill is overdue:
+*Invoice ID:* ${invoiceId}
+*Amount Due:* KES ${amount.toLocaleString()}
+*Meter:* ${meterNumber}
+
+Please settle immediately to avoid service disconnection.
+Pay via M-Pesa Till: *4984254*
+
+Contact us: +254768789382`;
+                    break;
+
+                case 'welcome':
+                    message = `*👋 WELCOME TO JOY WATER SUPPLIES!*
+
+Hello ${name},
+
+Thank you for choosing our services! We're excited to serve you.
+
+*Meter Number:* ${meterNumber}
+*Contact:* +254768789382
+*Location:* Mlolongo, Kenya
+
+For support, WhatsApp us anytime.
+Enjoy fresh water! 💧`;
+                    break;
+            }
+
+            document.getElementById('waMessageText').innerText = message;
+            document.getElementById('waTime').innerText = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        }
+
+        function openWhatsApp() {
+            const message = document.getElementById('waMessageText').innerText;
+            const encodedMsg = encodeURIComponent(message);
+            const phone = currentWaData.phone.replace(/[^0-9]/g, '');
+            
+            const whatsappUrl = `https://wa.me/${phone}?text=${encodedMsg}`;
+            window.open(whatsappUrl, '_blank');
+        }
+
+        function copyWaMessage() {
+            const message = document.getElementById('waMessageText').innerText;
+            navigator.clipboard.writeText(message).then(() => {
+                alert('✅ Message copied! Open WhatsApp and paste.');
+            }).catch(err => {
+                console.error('Failed to copy:', err);
+                alert('Copy failed. Please try again.');
+            });
+        }
+
+        document.getElementById('waModal')?.addEventListener('click', function(event) {
+            if (event.target === this) {
+                closeWaModal();
+            }
+        });
+
+        // Initialize dashboard on load
+        window.addEventListener('DOMContentLoaded', () => {
+            loadDashboard();
+        });
     </script>
-    document.getElementById("customerForm").addEventListener("submit", function(e) {
-  const submitBtn = document.getElementById("submitBtn");
-  submitBtn.disabled = true;
-  submitBtn.innerText = "Saving...";
-});
 </body>
 </html>
