@@ -561,6 +561,12 @@
         }
 
         // DEBTORS
+        // ADD CUSTOMER
+        async function addCustomer(event) {
+            // ... (keep this function as is)
+        }
+
+        // ⬇️ REPLACE THIS EXISTING FUNCTION BELOW ⬇️
         async function loadDebtors() {
             try {
                 const response = await fetch(SCRIPT_URL, {
@@ -602,6 +608,11 @@
             } catch (err) {
                 console.error('Debtors error:', err);
             }
+        }
+
+        // CUSTOMERS LIST
+        async function loadCustomers() {
+            // ... (keep this function as is)
         }
 
         // CUSTOMERS LIST
