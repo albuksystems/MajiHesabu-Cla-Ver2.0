@@ -3,95 +3,97 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MajiHesabu - Admin Dashboard</title>
-    <script src="config.js"></script>
+    <title>Joy Water Supplies - Utility Management System</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        :root {
+            --bg-dark: #0f172a;
+            --card-bg: #1e293b;
+            --card-border: #334155;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent-blue: #0284c7;
+            --accent-blue-hover: #0369a1;
+            --accent-green: #22c55e;
+            --accent-green-hover: #16a34a;
+            --accent-red: #ef4444;
+            --wa-green: #25D366;
+            --wa-green-hover: #1da851;
         }
 
-        :root {
-            --primary: #1a3a3a;
-            --secondary: #2d5a5a;
-            --accent: #C49424;
-            --success: #4CAF50;
-            --danger: #ff6b6b;
-            --warning: #ffc107;
-            --light-bg: #f5f5f5;
-            --text: #333;
-            --border: #ddd;
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         }
 
         body {
-            font-family: 'DM Mono', 'Courier New', monospace;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-            color: var(--text);
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            padding: 1.5rem;
             min-height: 100vh;
         }
 
-        header {
-            background: var(--primary);
-            color: white;
-            padding: 1.5rem;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-            position: sticky;
-            top: 0;
-            z-index: 100;
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
         }
 
-        .header-content {
-            max-width: 1400px;
-            margin: 0 auto;
+        /* Header & Navigation */
+        header {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--card-border);
         }
 
-        .logo {
-            font-size: 1.8rem;
-            font-weight: bold;
-            color: var(--accent);
+        .brand h1 {
+            font-size: 1.5rem;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
-        .refresh-btn {
-            background: var(--accent);
-            color: var(--primary);
-            border: none;
-            padding: 0.6rem 1.2rem;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: bold;
+        .brand span {
+            font-size: 0.875rem;
+            color: var(--text-muted);
         }
 
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 2rem 1rem;
-        }
-
-        .tabs {
+        .nav-tabs {
             display: flex;
             gap: 0.5rem;
-            margin-bottom: 2rem;
-            flex-wrap: wrap;
+            background: var(--card-bg);
+            padding: 0.35rem;
+            border-radius: 0.5rem;
+            border: 1px solid var(--card-border);
+            overflow-x: auto;
         }
 
         .tab-btn {
-            background: white;
-            border: 2px solid var(--border);
-            padding: 0.8rem 1.5rem;
-            border-radius: 8px;
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            padding: 0.6rem 1.2rem;
+            border-radius: 0.375rem;
             cursor: pointer;
-            font-weight: 600;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .tab-btn:hover {
+            color: var(--text-main);
         }
 
         .tab-btn.active {
-            background: var(--accent);
+            background: var(--accent-blue);
             color: white;
         }
 
+        /* Tab Panels */
         .tab-content {
             display: none;
         }
@@ -100,384 +102,425 @@
             display: block;
         }
 
-        .kpi-grid {
+        /* Cards & Grids */
+        .grid-kpi {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.5rem;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.25rem;
             margin-bottom: 2rem;
         }
 
         .kpi-card {
-            background: white;
-            padding: 2rem;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-            border-left: 4px solid var(--accent);
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 0.75rem;
+            padding: 1.25rem;
         }
 
-        .kpi-label {
-            font-size: 0.9rem;
-            color: #666;
+        .kpi-card .title {
+            font-size: 0.875rem;
+            color: var(--text-muted);
             margin-bottom: 0.5rem;
         }
 
-        .kpi-value {
-            font-size: 2.2rem;
-            font-weight: bold;
-            color: var(--primary);
+        .kpi-card .value {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .kpi-card .value-sub {
+            font-size: 0.85rem;
+            margin-top: 0.25rem;
+        }
+
+        /* Forms */
+        .form-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 0.75rem;
+            padding: 1.75rem;
+            max-width: 650px;
+            margin: 0 auto;
+        }
+
+        .form-card h2 {
+            margin-bottom: 1.25rem;
+            font-size: 1.25rem;
         }
 
         .form-group {
-            background: white;
-            padding: 2rem;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-            margin-bottom: 2rem;
-            max-width: 600px;
+            margin-bottom: 1.25rem;
         }
 
-        .form-title {
-            font-size: 1.3rem;
-            font-weight: bold;
-            margin-bottom: 1.5rem;
-            color: var(--primary);
-        }
-
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-            margin-bottom: 1rem;
-        }
-
-        .form-row.full {
-            grid-template-columns: 1fr;
-        }
-
-        label {
+        .form-group label {
             display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 600;
-            color: var(--primary);
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            margin-bottom: 0.4rem;
         }
 
-        input, select {
+        .form-control {
             width: 100%;
-            padding: 0.8rem;
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            font-family: inherit;
+            padding: 0.75rem;
+            background: var(--bg-dark);
+            border: 1px solid var(--card-border);
+            border-radius: 0.375rem;
+            color: var(--text-main);
+            font-size: 0.95rem;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--accent-blue);
         }
 
         .submit-btn {
-            background: var(--accent);
+            width: 100%;
+            padding: 0.8rem;
+            background: var(--accent-blue);
             color: white;
             border: none;
-            padding: 1rem 2rem;
-            border-radius: 8px;
-            font-weight: bold;
+            border-radius: 0.375rem;
+            font-weight: 600;
             cursor: pointer;
-            width: 100%;
-            margin-top: 1rem;
+            transition: background 0.2s;
         }
 
-        .message {
-            padding: 1rem;
-            border-radius: 8px;
-            margin-bottom: 1rem;
+        .submit-btn:hover {
+            background: var(--accent-blue-hover);
         }
 
-        .message.success {
-            background: #d4edda;
-            color: #155724;
-            border-left: 4px solid var(--success);
-        }
-
-        .message.error {
-            background: #f8d7da;
-            color: #721c24;
-            border-left: 4px solid var(--danger);
+        /* Tables */
+        .table-container {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 0.75rem;
+            overflow-x: auto;
         }
 
         .debtors-table {
             width: 100%;
             border-collapse: collapse;
-            background: white;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-        }
-
-        .debtors-table thead {
-            background: var(--primary);
-            color: white;
-        }
-
-        .debtors-table th, .debtors-table td {
-            padding: 1rem;
             text-align: left;
         }
 
-        .debtors-table tbody tr:hover {
-            background: #f5f5f5;
+        .debtors-table th,
+        .debtors-table td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--card-border);
         }
 
-        .action-btn {
-            background: var(--accent);
-            color: white;
-            border: none;
-            padding: 0.5rem 1rem;
-            border-radius: 6px;
-            cursor: pointer;
+        .debtors-table th {
+            background: rgba(0, 0, 0, 0.2);
+            color: var(--text-muted);
             font-size: 0.85rem;
-            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .debtors-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Action Buttons */
+        .action-btn {
+            padding: 0.4rem 0.8rem;
+            border-radius: 0.375rem;
+            border: none;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
         }
 
         .action-btn.whatsapp {
-            background: #25D366;
+            background: var(--wa-green);
+            color: white;
+        }
+
+        .action-btn.whatsapp:hover {
+            background: var(--wa-green-hover);
+        }
+
+        /* Message Notifications */
+        .message {
+            padding: 0.8rem 1rem;
+            border-radius: 0.375rem;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .message.success {
+            background: rgba(34, 197, 94, 0.15);
+            border: 1px solid var(--accent-green);
+            color: var(--accent-green);
+        }
+
+        .message.error {
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid var(--accent-red);
+            color: var(--accent-red);
+        }
+
+        /* Modal Overlay */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .modal-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 0.75rem;
+            width: 100%;
+            max-width: 500px;
+            overflow: hidden;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-header {
+            padding: 1rem 1.25rem;
+            background: rgba(0, 0, 0, 0.2);
+            border-bottom: 1px solid var(--card-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-body {
+            padding: 1.25rem;
+        }
+
+        .modal-footer {
+            padding: 1rem 1.25rem;
+            background: rgba(0, 0, 0, 0.2);
+            border-top: 1px solid var(--card-border);
+            display: flex;
+            gap: 0.75rem;
+            justify-content: flex-end;
+        }
+
+        .wa-preview-box {
+            background: #0b141a;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            font-family: inherit;
+            white-space: pre-wrap;
+            font-size: 0.9rem;
+            color: #e9edef;
+            border-left: 4px solid var(--wa-green);
+            margin-top: 1rem;
+            max-height: 250px;
+            overflow-y: auto;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 1px solid var(--card-border);
+            color: var(--text-main);
+            padding: 0.6rem 1rem;
+            border-radius: 0.375rem;
+            cursor: pointer;
+        }
+
+        .btn-secondary:hover {
+            background: var(--card-border);
         }
     </style>
 </head>
 <body>
-    <header>
-        <div class="header-content">
-            <div style="display: flex; align-items: center; gap: 2rem; flex: 1;">
-                <div class="logo">💧 MajiHesabu</div>
-                <div style="color: white; font-size: 1.2rem; font-weight: bold; border-left: 2px solid var(--accent); padding-left: 1rem;">
-                    Joy Water Supplies
-                </div>
-            </div>
-            <button class="refresh-btn" onclick="loadDashboard()">🔄 Refresh</button>
-        </div>
-    </header>
 
     <div class="container">
-        <div class="tabs">
-            <button class="tab-btn active" onclick="switchTab('dashboard', event)">📊 Dashboard</button>
-            <button class="tab-btn" onclick="switchTab('debtors', event)">💳 Debtors</button>
-            <button class="tab-btn" onclick="switchTab('add-customer', event)">➕ New Customer</button>
-            <button class="tab-btn" onclick="switchTab('customers', event)">👥 Customers</button>
-            <button class="tab-btn" onclick="switchTab('meter-reading', event)">📏 Meter Reading</button>
-        </div>
+        <!-- HEADER -->
+        <header>
+            <div class="brand">
+                <h1>💧 Joy Water Supplies</h1>
+                <span>Mlolongo Utility Management</span>
+            </div>
+            <nav class="nav-tabs">
+                <button class="tab-btn active" onclick="switchTab('dashboard', event)">Dashboard</button>
+                <button class="tab-btn" onclick="switchTab('debtors', event)">Debtors</button>
+                <button class="tab-btn" onclick="switchTab('customers', event)">Customers</button>
+                <button class="tab-btn" onclick="switchTab('meter-reading', event)">Record Reading</button>
+                <button class="tab-btn" onclick="switchTab('add-customer', event)">Add Customer</button>
+            </nav>
+        </header>
 
-        <!-- DASHBOARD TAB -->
-        <div id="dashboard" class="tab-content active">
-            <div id="dashboard-msg"></div>
-            <div class="kpi-grid">
+        <!-- TAB 1: DASHBOARD -->
+        <section id="dashboard" class="tab-content active">
+            <div class="grid-kpi">
                 <div class="kpi-card">
-                    <div class="kpi-label">Total Revenue</div>
-                    <div class="kpi-value">KES <span id="total-revenue">0</span></div>
-                    <div style="font-size: 0.85rem; color: #999; margin-top: 0.5rem;">All invoices issued</div>
+                    <div class="title">Total Revenue</div>
+                    <div class="value">KES <span id="total-revenue">0</span></div>
                 </div>
                 <div class="kpi-card">
-                    <div class="kpi-label">Amount Collected</div>
-                    <div class="kpi-value">KES <span id="total-collected">0</span></div>
-                    <div style="font-size: 0.85rem; color: #999; margin-top: 0.5rem;">Payments received</div>
+                    <div class="title">Total Collected</div>
+                    <div class="value" style="color: var(--accent-green);">KES <span id="total-collected">0</span></div>
                 </div>
                 <div class="kpi-card">
-                    <div class="kpi-label">Outstanding Balance</div>
-                    <div class="kpi-value">KES <span id="total-outstanding">0</span></div>
-                    <div style="font-size: 0.85rem; color: #999; margin-top: 0.5rem;">Amount owed</div>
+                    <div class="title">Outstanding Balance</div>
+                    <div class="value" style="color: var(--accent-red);">KES <span id="total-outstanding">0</span></div>
                 </div>
                 <div class="kpi-card">
-                    <div class="kpi-label">Collection Rate</div>
-                    <div class="kpi-value"><span id="collection-rate">0</span>%</div>
-                    <div style="font-size: 0.85rem; color: #999; margin-top: 0.5rem;">Payment efficiency</div>
+                    <div class="title">Collection Rate</div>
+                    <div class="value"><span id="collection-rate">0.0</span>%</div>
                 </div>
             </div>
-        </div>
+        </section>
 
-        <!-- DEBTORS TAB -->
-        <div id="debtors" class="tab-content">
-            <div id="debtors-msg"></div>
-            <h3 style="margin-bottom: 1rem; color: white;">💳 Top Debtors</h3>
-            <table class="debtors-table">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Name</th>
-                        <th>Phone</th>
-                        <th>Meter</th>
-                        <th>Amount Due</th>
-                        <th>Invoice</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="debtors-list">
-                    <tr><td colspan="7" style="text-align: center; padding: 2rem;">Loading debtors...</td></tr>
-                </tbody>
-            </table>
-        </div>
-
-        <!-- ADD CUSTOMER TAB -->
-        <div id="add-customer" class="tab-content">
-            <div class="form-group">
-                <div class="form-title">Add New Customer</div>
-                <div id="add-customer-message"></div>
-                <form onsubmit="addCustomer(event)">
-                    <div class="form-row">
-                        <div>
-                            <label>Phone Number* <span style="font-size: 0.8rem; color: #999;">(+254 or 0)</span></label>
-                            <input type="tel" id="phone" placeholder="+254700000001 or 0700000001" required>
-                        </div>
-                        <div>
-                            <label>Full Name*</label>
-                            <input type="text" id="name" placeholder="Customer name" required>
-                        </div>
-                    </div>
-
-                    <div class="form-row">
-                        <div>
-                            <label>Customer Type*</label>
-                            <select id="type" required>
-                                <option value="">Select type</option>
-                                <option value="Salty Water Vendor">Salty Water Vendor</option>
-                                <option value="Apartment Tenant">Apartment Tenant</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label>Meter Number*</label>
-                            <input type="text" id="meterNumber" placeholder="e.g., M-00123" required>
-                        </div>
-                    </div>
-
-                    <div class="form-row full">
-                        <div>
-                            <label>Location</label>
-                            <input type="text" id="location" placeholder="Physical location">
-                        </div>
-                    </div>
-
-                    <div class="form-row full">
-                        <div>
-                            <label>Email</label>
-                            <input type="email" id="email" placeholder="customer@email.com">
-                        </div>
-                    </div>
-
-                    <button type="submit" class="submit-btn">➕ Add Customer</button>
-                </form>
+        <!-- TAB 2: DEBTORS -->
+        <section id="debtors" class="tab-content">
+            <div class="table-container">
+                <table class="debtors-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Name</th>
+                            <th>Phone</th>
+                            <th>Meter</th>
+                            <th>Amount Due</th>
+                            <th>Invoice ID</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="debtors-list">
+                        <tr><td colspan="7" style="text-align: center; padding: 2rem; color: var(--text-muted);">Loading debtors...</td></tr>
+                    </tbody>
+                </table>
             </div>
-        </div>
+        </section>
 
-        <!-- CUSTOMERS TAB -->
-        <div id="customers" class="tab-content">
-            <div id="customers-msg"></div>
-            <h3 style="color: white; margin-bottom: 1rem;">👥 All Customers</h3>
-            <div style="background: white; border-radius: 12px; padding: 2rem; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);">
-                <div id="customersList" style="max-height: 600px; overflow-y: auto;">
-                    <p style="text-align: center; color: #999; padding: 2rem;">Loading customers...</p>
-                </div>
+        <!-- TAB 3: CUSTOMERS -->
+        <section id="customers" class="tab-content">
+            <div id="customersList" class="table-container">
+                <p style="text-align: center; padding: 2rem; color: var(--text-muted);">Loading customer directory...</p>
             </div>
-        </div>
+        </section>
 
-        <!-- METER READING TAB -->
-        <div id="meter-reading" class="tab-content">
-            <div class="form-group">
-                <div class="form-title">Record Meter Reading</div>
+        <!-- TAB 4: METER READING -->
+        <section id="meter-reading" class="tab-content">
+            <div class="form-card">
+                <h2>Record Meter Reading</h2>
                 <div id="meter-reading-message"></div>
                 <form onsubmit="recordReading(event)">
-                    <div class="form-row">
-                        <div>
-                            <label>Meter Number*</label>
-                            <input type="text" id="readMeter" placeholder="e.g., M-00123" required>
-                        </div>
-                        <div>
-                            <label>Current Reading Value*</label>
-                            <input type="number" id="readingValue" placeholder="e.g., 1250" required>
-                        </div>
+                    <div class="form-group">
+                        <label for="readMeter">Meter Number</label>
+                        <input type="text" id="readMeter" class="form-control" placeholder="e.g., M-1002" required>
                     </div>
-
-                    <div class="form-row">
-                        <div>
-                            <label>Reading Date</label>
-                            <input type="date" id="readingDate">
-                        </div>
-                        <div>
-                            <label>Recorded By*</label>
-                            <input type="text" id="recordedBy" placeholder="Meter reader name" required>
-                        </div>
+                    <div class="form-group">
+                        <label for="readingValue">Current Units / Value (m³)</label>
+                        <input type="number" step="0.01" id="readingValue" class="form-control" placeholder="0.00" required>
                     </div>
-
-                    <button type="submit" class="submit-btn">Record Reading & Generate Invoice</button>
+                    <div class="form-group">
+                        <label for="readingDate">Reading Date</label>
+                        <input type="date" id="readingDate" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="recordedBy">Recorded By (Officer/Staff)</label>
+                        <input type="text" id="recordedBy" class="form-control" placeholder="Staff name" required>
+                    </div>
+                    <button type="submit" class="submit-btn">Save Reading & Generate Invoice</button>
                 </form>
             </div>
-        </div>
+        </section>
+
+        <!-- TAB 5: ADD CUSTOMER -->
+        <section id="add-customer" class="tab-content">
+            <div class="form-card">
+                <h2>Register New Customer</h2>
+                <div id="add-customer-message"></div>
+                <form onsubmit="addCustomer(event)">
+                    <div class="form-group">
+                        <label for="name">Full Name</label>
+                        <input type="text" id="name" class="form-control" placeholder="e.g., John Doe" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">Phone Number</label>
+                        <input type="tel" id="phone" class="form-control" placeholder="0712345678" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="type">Account Type</label>
+                        <select id="type" class="form-control" required>
+                            <option value="Residential">Residential</option>
+                            <option value="Commercial">Commercial</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="meterNumber">Meter Number</label>
+                        <input type="text" id="meterNumber" class="form-control" placeholder="e.g., M-1005" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="location">Location / Plot / House No.</label>
+                        <input type="text" id="location" class="form-control" placeholder="e.g., Mlolongo Phase 2" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email Address (Optional)</label>
+                        <input type="email" id="email" class="form-control" placeholder="john@example.com">
+                    </div>
+                    <button type="submit" class="submit-btn">Register Customer</button>
+                </form>
+            </div>
+        </section>
     </div>
 
-    <!-- ═══ WHATSAPP MODAL ═══ -->
-    <div class="modal-overlay" id="waModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 1000; align-items: center; justify-content: center;">
-        <div class="modal-box" style="position: relative; max-height: 85vh; overflow-y: auto; background: white; border-radius: 12px; padding: 2rem; max-width: 500px; box-shadow: 0 10px 40px rgba(0,0,0,0.3);">
-            
-            <!-- Close Button -->
-            <button class="modal-close" onclick="closeWaModal()" style="position: absolute; top: 1rem; right: 1rem; background: none; border: none; font-size: 2rem; cursor: pointer; color: #999;">×</button>
-            
-            <!-- Modal Title -->
-            <div class="modal-title" style="font-size: 1.5rem; font-weight: bold; color: #1a3a3a; margin-bottom: 0.5rem;">Send via WhatsApp</div>
-            <div class="modal-sub" style="font-size: 0.9rem; color: #666; margin-bottom: 1.5rem;">Review message before sending</div>
-            
-            <!-- Message Type Selector -->
-            <div style="margin-bottom: 1.5rem;">
-                <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; color: #1a3a3a;">Message Type</label>
-                <select class="form-select" id="waMsgType" onchange="generateWaMessage()" style="width: 100%; padding: 0.8rem; border: 1px solid #ddd; border-radius: 6px; font-family: inherit; background: white; cursor: pointer;">
-                    <option value="invoice">📋 Invoice</option>
-                    <option value="reminder">🔔 Payment Reminder</option>
-                    <option value="receipt">✅ Payment Receipt</option>
-                    <option value="alert">⚠️ Alert Notice</option>
-                    <option value="welcome">👋 Welcome Message</option>
-                </select>
+    <!-- WHATSAPP MODAL -->
+    <div id="waModal" class="modal-overlay">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3>📱 WhatsApp Notification</h3>
+                <button class="btn-secondary" onclick="closeWaModal()" style="padding: 0.2rem 0.5rem;">✕</button>
             </div>
-            
-            <!-- Company Info Block -->
-            <div class="mpesa-block" style="background: #f5f5f5; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; display: flex; gap: 1rem; align-items: center;">
-                <div class="mpesa-icon" style="width: 50px; height: 50px; background: #C49424; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.5rem; color: white;">J</div>
-                <div>
-                    <div style="font-weight: bold; color: #1a3a3a;">Joy Water Supplies</div>
-                    <div style="font-size: 0.85rem; color: #666;">Phone: +254768789382</div>
-                    <div style="font-size: 0.85rem; color: #666;">Mlolongo, Kenya</div>
+            <div class="modal-body">
+                <div style="font-size: 0.9rem; margin-bottom: 0.8rem; color: var(--text-muted);">
+                    Recipient: <strong id="waCustomerName" style="color: var(--text-main);">Customer</strong> 
+                    (<span id="waCustomerPhone">Phone</span>)
+                    <br>
+                    Due Balance: <strong style="color: var(--accent-red);">KES <span id="waAmount">0</span></strong>
+                </div>
+
+                <div class="form-group">
+                    <label for="waMsgType">Select Message Template</label>
+                    <select id="waMsgType" class="form-control" onchange="generateWaMessage()">
+                        <option value="invoice">📋 Invoice Notification</option>
+                        <option value="reminder">🔔 Payment Reminder</option>
+                        <option value="alert">⚠️ Urgent Overdue Alert</option>
+                        <option value="receipt">✅ Payment Received Receipt</option>
+                        <option value="welcome">👋 New Customer Welcome</option>
+                    </select>
+                </div>
+
+                <div class="wa-preview-box">
+                    <div id="waMessageText">Generating preview...</div>
+                    <div style="text-align: right; font-size: 0.7rem; color: #8696a0; margin-top: 0.5rem;" id="waTime">12:00 PM</div>
                 </div>
             </div>
-            
-            <!-- Message Preview -->
-            <div style="background: #e8f5e9; padding: 1rem; border-radius: 12px; margin-bottom: 1.5rem; min-height: 100px;">
-                <div class="wa-bubble" id="waMessageText" style="background: #dcf8c6; padding: 0.8rem; border-radius: 8px; word-wrap: break-word; font-size: 0.95rem; line-height: 1.5; color: #1a3a3a;">
-                    Loading message...
-                </div>
-                <div class="wa-time" id="waTime" style="text-align: right; font-size: 0.75rem; color: #999; margin-top: 0.5rem;">
-                    12:30 PM
-                </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="copyWaMessage()">Copy Text</button>
+                <button class="action-btn whatsapp" onclick="openWhatsApp()" style="padding: 0.6rem 1.2rem;">Send via WhatsApp</button>
             </div>
-            
-            <!-- Customer Info -->
-            <div style="background: #f5f5f5; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; font-size: 0.9rem;">
-                <div><strong>To:</strong> <span id="waCustomerPhone"></span></div>
-                <div><strong>Customer:</strong> <span id="waCustomerName"></span></div>
-                <div><strong>Amount:</strong> KES <span id="waAmount">0</span></div>
-            </div>
-            
-            <!-- Action Buttons -->
-            <button class="btn btn-green" style="width: 100%; padding: 1rem; background: #25D366; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 1rem; margin-bottom: 0.8rem;" onclick="openWhatsApp()">
-                📲 Open in WhatsApp
-            </button>
-            
-            <button class="btn btn-outline" style="width: 100%; padding: 1rem; background: white; color: #1a3a3a; border: 2px solid #C49424; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 1rem; margin-bottom: 0.8rem;" onclick="copyWaMessage()">
-                📋 Copy Message
-            </button>
-            
-            <button class="btn btn-secondary" style="width: 100%; padding: 1rem; background: #f5f5f5; color: #1a3a3a; border: 1px solid #ddd; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 1rem;" onclick="closeWaModal()">
-                ✕ Close
-            </button>
         </div>
     </div>
 
     <script>
-        // Use CONFIG from config.js
-        const SCRIPT_URL = (typeof CONFIG !== 'undefined') ? CONFIG.API_ENDPOINT : "YOUR_DEPLOYED_GAS_URL_HERE";
-        console.log("🚀 Dashboard loaded. API URL:", SCRIPT_URL);
+        // ⚠️ REPLACE WITH YOUR APPS SCRIPT WEB APP URL ⚠️
+        const SCRIPT_URL = 'YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL';
 
         function switchTab(tabName, event) {
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
 
             if (event && event.target) {
                 event.target.classList.add('active');
@@ -496,7 +539,9 @@
             setTimeout(() => { el.innerHTML = ''; }, 5000);
         }
 
+        // ==========================================
         // DASHBOARD
+        // ==========================================
         async function loadDashboard() {
             try {
                 const response = await fetch(SCRIPT_URL, {
@@ -521,7 +566,9 @@
             }
         }
 
+        // ==========================================
         // ADD CUSTOMER
+        // ==========================================
         async function addCustomer(event) {
             event.preventDefault();
 
@@ -560,13 +607,9 @@
             }
         }
 
+        // ==========================================
         // DEBTORS
-        // ADD CUSTOMER
-        async function addCustomer(event) {
-            // ... (keep this function as is)
-        }
-
-        // ⬇️ REPLACE THIS EXISTING FUNCTION BELOW ⬇️
+        // ==========================================
         async function loadDebtors() {
             try {
                 const response = await fetch(SCRIPT_URL, {
@@ -582,7 +625,13 @@
                 const tbody = document.getElementById('debtors-list');
 
                 if (data.success && data.debtors && data.debtors.length > 0) {
-                    tbody.innerHTML = data.debtors.map((d, i) => `
+                    tbody.innerHTML = data.debtors.map((d, i) => {
+                        const safeName = (d.name || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+                        const safePhone = (d.phone || '').replace(/'/g, "\\'");
+                        const safeInvoice = (d.invoiceId || '').replace(/'/g, "\\'");
+                        const safeMeter = (d.meterNumber || '').replace(/'/g, "\\'");
+
+                        return `
                         <tr>
                             <td>${i + 1}</td>
                             <td>${d.name}</td>
@@ -592,30 +641,27 @@
                             <td>${d.invoiceId}</td>
                             <td>
                                 <button class="action-btn whatsapp" onclick="openWaModal(
-                                    '${d.phone}',
-                                    '${d.name.replace(/'/g, "\\'")}',
+                                    '${safePhone}',
+                                    '${safeName}',
                                     ${d.amountDue || 0},
-                                    '${d.invoiceId}',
-                                    '${d.meterNumber || ''}',
+                                    '${safeInvoice}',
+                                    '${safeMeter}',
                                     'Overdue'
                                 )">📱 WhatsApp</button>
                             </td>
-                        </tr>
-                    `).join('');
+                        </tr>`;
+                    }).join('');
                 } else {
-                    tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 2rem;">No debtors found</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 2rem; color: var(--text-muted);">No debtors found</td></tr>';
                 }
             } catch (err) {
                 console.error('Debtors error:', err);
             }
         }
 
+        // ==========================================
         // CUSTOMERS LIST
-        async function loadCustomers() {
-            // ... (keep this function as is)
-        }
-
-        // CUSTOMERS LIST
+        // ==========================================
         async function loadCustomers() {
             try {
                 const response = await fetch(SCRIPT_URL, {
@@ -632,7 +678,7 @@
 
                 if (data.success && data.customers && data.customers.length > 0) {
                     listEl.innerHTML = `
-                        <table class="debtors-table" style="width: 100%;">
+                        <table class="debtors-table">
                             <thead>
                                 <tr>
                                     <th>ID</th>
@@ -651,21 +697,23 @@
                                         <td>${c.phone}</td>
                                         <td>${c.type}</td>
                                         <td>${c.meterNumber}</td>
-                                        <td><span style="color: #4CAF50; font-weight: bold;">${c.status || 'Active'}</span></td>
+                                        <td><span style="color: var(--accent-green); font-weight: bold;">${c.status || 'Active'}</span></td>
                                     </tr>
                                 `).join('')}
                             </tbody>
                         </table>
                     `;
                 } else {
-                    listEl.innerHTML = '<p style="text-align: center; color: #999;">No customers found</p>';
+                    listEl.innerHTML = '<p style="text-align: center; padding: 2rem; color: var(--text-muted);">No customers found</p>';
                 }
             } catch (err) {
                 console.error('Customers error:', err);
             }
         }
 
+        // ==========================================
         // METER READING
+        // ==========================================
         async function recordReading(event) {
             event.preventDefault();
 
@@ -702,9 +750,9 @@
             }
         }
 
-        // ══════════════════════════════════════════════════════════════
+        // ==========================================
         // WHATSAPP MODAL LOGIC
-        // ══════════════════════════════════════════════════════════════
+        // ==========================================
         let currentWaData = {
             phone: "",
             name: "",
@@ -744,80 +792,23 @@
 
             switch(msgType) {
                 case 'invoice':
-                    message = `*📋 WATER BILL NOTIFICATION*
-
-Hello ${name},
-
-Your invoice for water services is ready:
-*Invoice ID:* ${invoiceId}
-*Meter Number:* ${meterNumber}
-*Amount Due:* KES ${amount.toLocaleString()}
-*Due Date:* Within 15 days
-
-*Pay via M-Pesa Till:* 4984254
-*Business Name:* Joy Water Supplies
-
-Thank you for being a valued customer! 🙏`;
+                    message = `*📋 WATER BILL NOTIFICATION*\n\nHello ${name},\n\nYour invoice for water services is ready:\n*Invoice ID:* ${invoiceId}\n*Meter Number:* ${meterNumber}\n*Amount Due:* KES ${amount.toLocaleString()}\n*Due Date:* Within 15 days\n\n*Pay via M-Pesa Till:* 4984254\n*Business Name:* Joy Water Supplies\n\nThank you for being a valued customer! 🙏`;
                     break;
 
                 case 'reminder':
-                    message = `*🔔 PAYMENT REMINDER*
-
-Hello ${name},
-
-This is a friendly reminder that your water bill is due:
-*Invoice ID:* ${invoiceId}
-*Amount Due:* KES ${amount.toLocaleString()}
-
-Please pay via M-Pesa Till: *4984254*
-Account Name: Joy Water Supplies
-
-Thank you! 💧`;
+                    message = `*🔔 PAYMENT REMINDER*\n\nHello ${name},\n\nThis is a friendly reminder that your water bill is due:\n*Invoice ID:* ${invoiceId}\n*Amount Due:* KES ${amount.toLocaleString()}\n\nPlease pay via M-Pesa Till: *4984254*\nAccount Name: Joy Water Supplies\n\nThank you! 💧`;
                     break;
 
                 case 'receipt':
-                    message = `*✅ PAYMENT RECEIVED*
-
-Hello ${name},
-
-Thank you for your payment! 🙏
-*Invoice ID:* ${invoiceId}
-*Amount Paid:* KES ${amount.toLocaleString()}
-*Date:* ${new Date().toLocaleDateString()}
-
-Your account is now up to date.
-For any issues, contact us at +254768789382`;
+                    message = `*✅ PAYMENT RECEIVED*\n\nHello ${name},\n\nThank you for your payment! 🙏\n*Invoice ID:* ${invoiceId}\n*Amount Paid:* KES ${amount.toLocaleString()}\n*Date:* ${new Date().toLocaleDateString()}\n\nYour account is now up to date.\nFor any issues, contact us at +254768789382`;
                     break;
 
                 case 'alert':
-                    message = `*⚠️ URGENT: BILL ALERT*
-
-Hello ${name},
-
-Your water bill is overdue:
-*Invoice ID:* ${invoiceId}
-*Amount Due:* KES ${amount.toLocaleString()}
-*Meter:* ${meterNumber}
-
-Please settle immediately to avoid service disconnection.
-Pay via M-Pesa Till: *4984254*
-
-Contact us: +254768789382`;
+                    message = `*⚠️ URGENT: BILL ALERT*\n\nHello ${name},\n\nYour water bill is overdue:\n*Invoice ID:* ${invoiceId}\n*Amount Due:* KES ${amount.toLocaleString()}\n*Meter:* ${meterNumber}\n\nPlease settle immediately to avoid service disconnection.\nPay via M-Pesa Till: *4984254*\n\nContact us: +254768789382`;
                     break;
 
                 case 'welcome':
-                    message = `*👋 WELCOME TO JOY WATER SUPPLIES!*
-
-Hello ${name},
-
-Thank you for choosing our services! We're excited to serve you.
-
-*Meter Number:* ${meterNumber}
-*Contact:* +254768789382
-*Location:* Mlolongo, Kenya
-
-For support, WhatsApp us anytime.
-Enjoy fresh water! 💧`;
+                    message = `*👋 WELCOME TO JOY WATER SUPPLIES!*\n\nHello ${name},\n\nThank you for choosing our services! We're excited to serve you.\n\n*Meter Number:* ${meterNumber}\n*Contact:* +254768789382\n*Location:* Mlolongo, Kenya\n\nFor support, WhatsApp us anytime.\nEnjoy fresh water! 💧`;
                     break;
             }
 
@@ -828,7 +819,12 @@ Enjoy fresh water! 💧`;
         function openWhatsApp() {
             const message = document.getElementById('waMessageText').innerText;
             const encodedMsg = encodeURIComponent(message);
-            const phone = currentWaData.phone.replace(/[^0-9]/g, '');
+            let phone = currentWaData.phone.replace(/[^0-9]/g, '');
+            
+            // Format local numbers (e.g., 0712345678 -> 254712345678)
+            if (phone.startsWith('0')) {
+                phone = '254' + phone.substring(1);
+            }
             
             const whatsappUrl = `https://wa.me/${phone}?text=${encodedMsg}`;
             window.open(whatsappUrl, '_blank');
@@ -849,6 +845,9 @@ Enjoy fresh water! 💧`;
                 closeWaModal();
             }
         });
+
+        // Initialize default reading date to today
+        document.getElementById('readingDate').valueAsDate = new Date();
 
         // Initialize dashboard on load
         window.addEventListener('DOMContentLoaded', () => {
