@@ -662,34 +662,66 @@
         // ==========================================
         // CUSTOMERS LIST
         // ==========================================
-        // 1. Declare at the top of your <script> section (or right above loadCustomers)
+      // CUSTOMERS LIST
+// ==========================================
+// Global customer registry (declared ONCE)
 let globalCustomersList = [];
 
-// 2. Replace your existing loadCustomers function (around lines 674-710)
-// Global customer registry
-let globalCustomersList = [];
-
-// 1. Corrected loadCustomers (POST request via text/plain to avoid CORS preflight)
+// Load customers from backend
 async function loadCustomers() {
   try {
     const response = await fetch(SCRIPT_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify({ action: 'getCustomers' }) // Ensure action matches Code.gs ('getCustomers' or 'loadCustomers')
+      body: JSON.stringify({ action: 'loadCustomers' })
     });
     
     const result = await response.json();
     
-    if (result.success && Array.isArray(result.data)) {
-      globalCustomersList = result.data;
+    if (result.success || Array.isArray(result.data) || Array.isArray(result)) {
+      globalCustomersList = result.data || result;
       populateCustomerDropdown(globalCustomersList);
     } else {
       console.error('Failed to load customers:', result.message || result);
     }
   } catch (err) {
-    console.error('Error in loadCustomers:', err);
+    console.error('Error loading customers:', err);
   }
-}        // ==========================================
+}
+
+// Populate customer dropdown and set up event listeners
+function populateCustomerDropdown(customers) {
+  const select = document.getElementById('customerSelect');
+  if (!select) return;
+
+  select.innerHTML = '<option value="">-- Select Customer --</option>';
+  
+  customers.forEach(c => {
+    const opt = document.createElement('option');
+    opt.value = c.id || c.customerId;
+    opt.textContent = `${c.name || 'Unknown'} (${c.meterNumber || c.phone || 'No Meter'})`;
+    select.appendChild(opt);
+  });
+}
+
+// Selection change handler for populating previous reading
+function onCustomerSelectChange() {
+  const selectElement = document.getElementById('customerSelect');
+  if (!selectElement) return;
+
+  const selectedCustomerId = selectElement.value;
+  const customer = globalCustomersList.find(c => (c.id || c.customerId) === selectedCustomerId);
+  
+  const prevInput = document.getElementById('prevReadingInput');
+  if (prevInput) {
+    prevInput.value = (customer && customer.lastReading !== undefined) ? customer.lastReading : 0;
+  }
+  
+  if (typeof calculateConsumption === 'function') {
+    calculateConsumption();
+  }
+}
+        // ==========================================
         // METER READING
         // ==========================================
         async function recordReading(event) {
