@@ -867,5 +867,57 @@ function onCustomerSelectChange() {
             loadDashboard();
         });
     </script>
+    function calculateConsumption() {
+  const prevInput = document.getElementById('prevReadingInput');
+  const currInput = document.getElementById('currentReadingInput');
+  const consumptionDisplay = document.getElementById('consumptionPreview');
+  const costDisplay = document.getElementById('costPreview');
+  const submitBtn = document.getElementById('submitReadingBtn');
+
+  if (!prevInput || !currInput || !consumptionDisplay) return;
+
+  const previous = parseFloat(prevInput.value) || 0;
+  const currentVal = currInput.value.trim();
+
+  // If user hasn't entered a current reading yet
+  if (currentVal === "") {
+    consumptionDisplay.textContent = "0";
+    consumptionDisplay.className = "text-gray-500 font-bold";
+    if (costDisplay) costDisplay.textContent = "KSh 0.00";
+    if (submitBtn) submitBtn.disabled = false;
+    return;
+  }
+
+  const current = parseFloat(currentVal);
+
+  if (isNaN(current)) {
+    consumptionDisplay.textContent = "Invalid entry";
+    consumptionDisplay.className = "text-red-500 font-bold";
+    if (submitBtn) submitBtn.disabled = true;
+    return;
+  }
+
+  const consumption = current - previous;
+  const RATE_PER_UNIT = 150; // Adjust rate per m³ as needed
+
+  if (consumption < 0) {
+    // Negative consumption warning (Current reading < Previous reading)
+    consumptionDisplay.textContent = `${consumption.toFixed(2)} m³ (Warning: Current reading is lower than previous!)`;
+    consumptionDisplay.className = "text-red-600 font-bold";
+    if (costDisplay) costDisplay.textContent = "KSh 0.00";
+    if (submitBtn) submitBtn.disabled = true; // Prevent submission of invalid readings
+  } else {
+    // Normal positive consumption
+    consumptionDisplay.textContent = `${consumption.toFixed(2)} m³`;
+    consumptionDisplay.className = "text-green-600 font-bold";
+    
+    if (costDisplay) {
+      const estimatedCost = consumption * RATE_PER_UNIT;
+      costDisplay.textContent = `KSh ${estimatedCost.toLocaleString('en-KE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    }
+    
+    if (submitBtn) submitBtn.disabled = false;
+  }
+}
 </body>
 </html>
