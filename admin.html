@@ -868,56 +868,73 @@ function onCustomerSelectChange() {
         });
     </script>
     function calculateConsumption() {
+  // 1. Get references to HTML elements
   const prevInput = document.getElementById('prevReadingInput');
   const currInput = document.getElementById('currentReadingInput');
+  const rolloverCheck = document.getElementById('isRolloverCheckbox');
   const consumptionDisplay = document.getElementById('consumptionPreview');
   const costDisplay = document.getElementById('costPreview');
   const submitBtn = document.getElementById('submitReadingBtn');
 
   if (!prevInput || !currInput || !consumptionDisplay) return;
 
+  // 2. Read values
   const previous = parseFloat(prevInput.value) || 0;
   const currentVal = currInput.value.trim();
+  const isRollover = rolloverCheck ? rolloverCheck.checked : false;
 
-  // If user hasn't entered a current reading yet
+  // 3. Handle empty input (User hasn't typed anything yet)
   if (currentVal === "") {
-    consumptionDisplay.textContent = "0";
+    consumptionDisplay.textContent = "0 m³";
     consumptionDisplay.className = "text-gray-500 font-bold";
     if (costDisplay) costDisplay.textContent = "KSh 0.00";
     if (submitBtn) submitBtn.disabled = false;
     return;
   }
 
+  // 4. Validate numeric input
   const current = parseFloat(currentVal);
 
   if (isNaN(current)) {
     consumptionDisplay.textContent = "Invalid entry";
     consumptionDisplay.className = "text-red-500 font-bold";
+    if (costDisplay) costDisplay.textContent = "KSh 0.00";
     if (submitBtn) submitBtn.disabled = true;
     return;
   }
 
-  const consumption = current - previous;
-  const RATE_PER_UNIT = 150; // Adjust rate per m³ as needed
+  // 5. Calculate consumption & validate against previous reading
+  let consumption = 0;
+  const RATE_PER_UNIT = 150; // Rate in KSh per m³ (adjust as needed)
 
-  if (consumption < 0) {
-    // Negative consumption warning (Current reading < Previous reading)
-    consumptionDisplay.textContent = `${consumption.toFixed(2)} m³ (Warning: Current reading is lower than previous!)`;
-    consumptionDisplay.className = "text-red-600 font-bold";
-    if (costDisplay) costDisplay.textContent = "KSh 0.00";
-    if (submitBtn) submitBtn.disabled = true; // Prevent submission of invalid readings
-  } else {
-    // Normal positive consumption
-    consumptionDisplay.textContent = `${consumption.toFixed(2)} m³`;
-    consumptionDisplay.className = "text-green-600 font-bold";
-    
-    if (costDisplay) {
-      const estimatedCost = consumption * RATE_PER_UNIT;
-      costDisplay.textContent = `KSh ${estimatedCost.toLocaleString('en-KE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-    }
-    
+  if (isRollover) {
+    // Rollover/Reset mode: treat entire current reading as new consumption
+    consumption = current;
+    consumptionDisplay.textContent = `${consumption.toFixed(2)} m³ (Meter Reset / Rollover Active)`;
+    consumptionDisplay.className = "text-amber-600 font-bold";
     if (submitBtn) submitBtn.disabled = false;
+  } else {
+    consumption = current - previous;
+
+    if (consumption < 0) {
+      // Error: Reading dropped without checking rollover
+      consumptionDisplay.textContent = `${consumption.toFixed(2)} m³ (Error: Reading lower than previous. Check 'Meter replaced' if intended)`;
+      consumptionDisplay.className = "text-red-600 font-bold";
+      if (costDisplay) costDisplay.textContent = "KSh 0.00";
+      if (submitBtn) submitBtn.disabled = true; // Prevent submission of invalid data
+      return;
+    } else {
+      // Normal positive consumption
+      consumptionDisplay.textContent = `${consumption.toFixed(2)} m³`;
+      consumptionDisplay.className = "text-green-600 font-bold";
+      if (submitBtn) submitBtn.disabled = false;
+    }
   }
-}
-</body>
+
+  // 6. Update cost preview
+  if (costDisplay) {
+    const estimatedCost = consumption * RATE_PER_UNIT;
+    costDisplay.textContent = `KSh ${estimatedCost.toLocaleString('en-KE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  }
+}</body>
 </html>
