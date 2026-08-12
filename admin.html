@@ -159,33 +159,39 @@
     </section>
 
     <!-- 5. ADD CUSTOMER SECTION -->
-    <section id="section-addCustomer" class="tab-content hidden">
-      <div class="max-w-xl mx-auto bg-white rounded-xl shadow-md p-6">
-        <h2 class="text-xl font-bold text-gray-800 mb-4 border-b pb-2">Add New Customer</h2>
-        <form onsubmit="createCustomer(event)">
-          <div class="mb-4">
-            <label class="block text-sm font-semibold text-gray-700 mb-1">Full Name</label>
-            <input type="text" id="newCustomerName" class="w-full border rounded-lg p-2.5" required>
-          </div>
-          <div class="mb-4">
-            <label class="block text-sm font-semibold text-gray-700 mb-1">Phone Number</label>
-            <input type="text" id="newCustomerPhone" placeholder="07XXXXXXXX" class="w-full border rounded-lg p-2.5" required>
-          </div>
-          <div class="mb-4">
-            <label class="block text-sm font-semibold text-gray-700 mb-1">Location / House No.</label>
-            <input type="text" id="newCustomerLocation" class="w-full border rounded-lg p-2.5" required>
-          </div>
-          <div class="mb-6">
-            <label class="block text-sm font-semibold text-gray-700 mb-1">Meter Serial Number</label>
-            <input type="text" id="newCustomerMeter" class="w-full border rounded-lg p-2.5" required>
-          </div>
-          <button type="submit" class="w-full bg-green-600 text-white font-bold py-3 rounded-lg hover:bg-green-700 transition shadow">
-            Save Customer
-          </button>
-        </form>
+<section id="section-addCustomer" class="tab-content hidden">
+  <div class="max-w-xl mx-auto bg-white rounded-xl shadow-md p-6">
+    <h2 class="text-xl font-bold text-gray-800 mb-4 border-b pb-2">Add New Customer</h2>
+    <form id="addCustomerForm" onsubmit="createCustomer(event)">
+      <div class="mb-4">
+        <label class="block text-sm font-semibold text-gray-700 mb-1">Full Name</label>
+        <input type="text" id="newCustomerName" class="w-full border rounded-lg p-2.5" required>
       </div>
-    </section>
-
+      <div class="mb-4">
+        <label class="block text-sm font-semibold text-gray-700 mb-1">Phone Number</label>
+        <input type="text" id="newCustomerPhone" placeholder="07XXXXXXXX" class="w-full border rounded-lg p-2.5" required>
+      </div>
+      <div class="mb-4">
+        <label class="block text-sm font-semibold text-gray-700 mb-1">Customer Type</label>
+        <select id="newCustomerType" class="w-full border rounded-lg p-2.5 bg-gray-50" required>
+          <option value="Apartment Tenant">Apartment Tenant</option>
+          <option value="Salty Water Vendor">Salty Water Vendor</option>
+        </select>
+      </div>
+      <div class="mb-4">
+        <label class="block text-sm font-semibold text-gray-700 mb-1">Location / House No.</label>
+        <input type="text" id="newCustomerLocation" placeholder="e.g. Mlolongo Phase 3 / B9" class="w-full border rounded-lg p-2.5" required>
+      </div>
+      <div class="mb-6">
+        <label class="block text-sm font-semibold text-gray-700 mb-1">Meter Serial Number</label>
+        <input type="text" id="newCustomerMeter" class="w-full border rounded-lg p-2.5" required>
+      </div>
+      <button type="submit" id="addCustomerBtn" class="w-full bg-green-600 text-white font-bold py-3 rounded-lg hover:bg-green-700 transition shadow">
+        Save Customer
+      </button>
+    </form>
+  </div>
+</section>
   </main>
 
   <!-- ALL JAVASCRIPT LOGIC MUST STAY INSIDE THIS SCRIPT TAG -->
