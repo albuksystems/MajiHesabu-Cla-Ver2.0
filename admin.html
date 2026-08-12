@@ -1,942 +1,540 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Joy Water Supplies - Utility Management System</title>
-    <style>
-        :root {
-            --bg-dark: #0f172a;
-            --card-bg: #1e293b;
-            --card-border: #334155;
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --accent-blue: #0284c7;
-            --accent-blue-hover: #0369a1;
-            --accent-green: #22c55e;
-            --accent-green-hover: #16a34a;
-            --accent-red: #ef4444;
-            --wa-green: #25D366;
-            --wa-green-hover: #1da851;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-        }
-
-        body {
-            background-color: var(--bg-dark);
-            color: var(--text-main);
-            padding: 1.5rem;
-            min-height: 100vh;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        /* Header & Navigation */
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid var(--card-border);
-        }
-
-        .brand h1 {
-            font-size: 1.5rem;
-            color: var(--text-main);
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .brand span {
-            font-size: 0.875rem;
-            color: var(--text-muted);
-        }
-
-        .nav-tabs {
-            display: flex;
-            gap: 0.5rem;
-            background: var(--card-bg);
-            padding: 0.35rem;
-            border-radius: 0.5rem;
-            border: 1px solid var(--card-border);
-            overflow-x: auto;
-        }
-
-        .tab-btn {
-            background: transparent;
-            border: none;
-            color: var(--text-muted);
-            padding: 0.6rem 1.2rem;
-            border-radius: 0.375rem;
-            cursor: pointer;
-            font-weight: 500;
-            transition: all 0.2s ease;
-            white-space: nowrap;
-        }
-
-        .tab-btn:hover {
-            color: var(--text-main);
-        }
-
-        .tab-btn.active {
-            background: var(--accent-blue);
-            color: white;
-        }
-
-        /* Tab Panels */
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        /* Cards & Grids */
-        .grid-kpi {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 1.25rem;
-            margin-bottom: 2rem;
-        }
-
-        .kpi-card {
-            background: var(--card-bg);
-            border: 1px solid var(--card-border);
-            border-radius: 0.75rem;
-            padding: 1.25rem;
-        }
-
-        .kpi-card .title {
-            font-size: 0.875rem;
-            color: var(--text-muted);
-            margin-bottom: 0.5rem;
-        }
-
-        .kpi-card .value {
-            font-size: 1.75rem;
-            font-weight: 700;
-            color: var(--text-main);
-        }
-
-        .kpi-card .value-sub {
-            font-size: 0.85rem;
-            margin-top: 0.25rem;
-        }
-
-        /* Forms */
-        .form-card {
-            background: var(--card-bg);
-            border: 1px solid var(--card-border);
-            border-radius: 0.75rem;
-            padding: 1.75rem;
-            max-width: 650px;
-            margin: 0 auto;
-        }
-
-        .form-card h2 {
-            margin-bottom: 1.25rem;
-            font-size: 1.25rem;
-        }
-
-        .form-group {
-            margin-bottom: 1.25rem;
-        }
-
-        .form-group label {
-            display: block;
-            font-size: 0.875rem;
-            color: var(--text-muted);
-            margin-bottom: 0.4rem;
-        }
-
-        .form-control {
-            width: 100%;
-            padding: 0.75rem;
-            background: var(--bg-dark);
-            border: 1px solid var(--card-border);
-            border-radius: 0.375rem;
-            color: var(--text-main);
-            font-size: 0.95rem;
-        }
-
-        .form-control:focus {
-            outline: none;
-            border-color: var(--accent-blue);
-        }
-
-        .submit-btn {
-            width: 100%;
-            padding: 0.8rem;
-            background: var(--accent-blue);
-            color: white;
-            border: none;
-            border-radius: 0.375rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-
-        .submit-btn:hover {
-            background: var(--accent-blue-hover);
-        }
-
-        /* Tables */
-        .table-container {
-            background: var(--card-bg);
-            border: 1px solid var(--card-border);
-            border-radius: 0.75rem;
-            overflow-x: auto;
-        }
-
-        .debtors-table {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: left;
-        }
-
-        .debtors-table th,
-        .debtors-table td {
-            padding: 1rem;
-            border-bottom: 1px solid var(--card-border);
-        }
-
-        .debtors-table th {
-            background: rgba(0, 0, 0, 0.2);
-            color: var(--text-muted);
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        .debtors-table tr:last-child td {
-            border-bottom: none;
-        }
-
-        /* Action Buttons */
-        .action-btn {
-            padding: 0.4rem 0.8rem;
-            border-radius: 0.375rem;
-            border: none;
-            font-size: 0.85rem;
-            font-weight: 600;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.4rem;
-        }
-
-        .action-btn.whatsapp {
-            background: var(--wa-green);
-            color: white;
-        }
-
-        .action-btn.whatsapp:hover {
-            background: var(--wa-green-hover);
-        }
-
-        /* Message Notifications */
-        .message {
-            padding: 0.8rem 1rem;
-            border-radius: 0.375rem;
-            margin-bottom: 1rem;
-            font-size: 0.9rem;
-        }
-
-        .message.success {
-            background: rgba(34, 197, 94, 0.15);
-            border: 1px solid var(--accent-green);
-            color: var(--accent-green);
-        }
-
-        .message.error {
-            background: rgba(239, 68, 68, 0.15);
-            border: 1px solid var(--accent-red);
-            color: var(--accent-red);
-        }
-
-        /* Modal Overlay */
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.75);
-            backdrop-filter: blur(4px);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
-            padding: 1rem;
-        }
-
-        .modal-card {
-            background: var(--card-bg);
-            border: 1px solid var(--card-border);
-            border-radius: 0.75rem;
-            width: 100%;
-            max-width: 500px;
-            overflow: hidden;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
-        }
-
-        .modal-header {
-            padding: 1rem 1.25rem;
-            background: rgba(0, 0, 0, 0.2);
-            border-bottom: 1px solid var(--card-border);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .modal-body {
-            padding: 1.25rem;
-        }
-
-        .modal-footer {
-            padding: 1rem 1.25rem;
-            background: rgba(0, 0, 0, 0.2);
-            border-top: 1px solid var(--card-border);
-            display: flex;
-            gap: 0.75rem;
-            justify-content: flex-end;
-        }
-
-        .wa-preview-box {
-            background: #0b141a;
-            border-radius: 0.5rem;
-            padding: 1rem;
-            font-family: inherit;
-            white-space: pre-wrap;
-            font-size: 0.9rem;
-            color: #e9edef;
-            border-left: 4px solid var(--wa-green);
-            margin-top: 1rem;
-            max-height: 250px;
-            overflow-y: auto;
-        }
-
-        .btn-secondary {
-            background: transparent;
-            border: 1px solid var(--card-border);
-            color: var(--text-main);
-            padding: 0.6rem 1rem;
-            border-radius: 0.375rem;
-            cursor: pointer;
-        }
-
-        .btn-secondary:hover {
-            background: var(--card-border);
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Joy Water Supplies - Utility Management</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
+<body class="bg-gray-100 font-sans leading-normal tracking-normal">
 
-    <div class="container">
-        <!-- HEADER -->
-        <header>
-            <div class="brand">
-                <h1>💧 Joy Water Supplies</h1>
-                <span>Mlolongo Utility Management</span>
-            </div>
-            <nav class="nav-tabs">
-                <button class="tab-btn active" onclick="switchTab('dashboard', event)">Dashboard</button>
-                <button class="tab-btn" onclick="switchTab('debtors', event)">Debtors</button>
-                <button class="tab-btn" onclick="switchTab('customers', event)">Customers</button>
-                <button class="tab-btn" onclick="switchTab('meter-reading', event)">Record Reading</button>
-                <button class="tab-btn" onclick="switchTab('add-customer', event)">Add Customer</button>
-            </nav>
-        </header>
-
-        <!-- TAB 1: DASHBOARD -->
-        <section id="dashboard" class="tab-content active">
-            <div class="grid-kpi">
-                <div class="kpi-card">
-                    <div class="title">Total Revenue</div>
-                    <div class="value">KES <span id="total-revenue">0</span></div>
-                </div>
-                <div class="kpi-card">
-                    <div class="title">Total Collected</div>
-                    <div class="value" style="color: var(--accent-green);">KES <span id="total-collected">0</span></div>
-                </div>
-                <div class="kpi-card">
-                    <div class="title">Outstanding Balance</div>
-                    <div class="value" style="color: var(--accent-red);">KES <span id="total-outstanding">0</span></div>
-                </div>
-                <div class="kpi-card">
-                    <div class="title">Collection Rate</div>
-                    <div class="value"><span id="collection-rate">0.0</span>%</div>
-                </div>
-            </div>
-        </section>
-
-        <!-- TAB 2: DEBTORS -->
-        <section id="debtors" class="tab-content">
-            <div class="table-container">
-                <table class="debtors-table">
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Name</th>
-                            <th>Phone</th>
-                            <th>Meter</th>
-                            <th>Amount Due</th>
-                            <th>Invoice ID</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody id="debtors-list">
-                        <tr><td colspan="7" style="text-align: center; padding: 2rem; color: var(--text-muted);">Loading debtors...</td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </section>
-
-        <!-- TAB 3: CUSTOMERS -->
-        <section id="customers" class="tab-content">
-            <div id="customersList" class="table-container">
-                <p style="text-align: center; padding: 2rem; color: var(--text-muted);">Loading customer directory...</p>
-            </div>
-        </section>
-
-        <!-- TAB 4: METER READING -->
-        <section id="meter-reading" class="tab-content">
-            <div class="form-card">
-                <h2>Record Meter Reading</h2>
-                <div id="meter-reading-message"></div>
-                <form onsubmit="recordReading(event)">
-                    <div class="form-group">
-                        <label for="readMeter">Meter Number</label>
-                        <input type="text" id="readMeter" class="form-control" placeholder="e.g., M-1002" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="readingValue">Current Units / Value (m³)</label>
-                        <input type="number" step="0.01" id="readingValue" class="form-control" placeholder="0.00" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="readingDate">Reading Date</label>
-                        <input type="date" id="readingDate" class="form-control" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="recordedBy">Recorded By (Officer/Staff)</label>
-                        <input type="text" id="recordedBy" class="form-control" placeholder="Staff name" required>
-                    </div>
-                    <button type="submit" class="submit-btn">Save Reading & Generate Invoice</button>
-                </form>
-            </div>
-        </section>
-
-        <!-- TAB 5: ADD CUSTOMER -->
-        <section id="add-customer" class="tab-content">
-            <div class="form-card">
-                <h2>Register New Customer</h2>
-                <div id="add-customer-message"></div>
-                <form onsubmit="addCustomer(event)">
-                    <div class="form-group">
-                        <label for="name">Full Name</label>
-                        <input type="text" id="name" class="form-control" placeholder="e.g., John Doe" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="phone">Phone Number</label>
-                        <input type="tel" id="phone" class="form-control" placeholder="0712345678" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="type">Account Type</label>
-                        <select id="type" class="form-control" required>
-                            <option value="Residential">Residential</option>
-                            <option value="Commercial">Commercial</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="meterNumber">Meter Number</label>
-                        <input type="text" id="meterNumber" class="form-control" placeholder="e.g., M-1005" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="location">Location / Plot / House No.</label>
-                        <input type="text" id="location" class="form-control" placeholder="e.g., Mlolongo Phase 2" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="email">Email Address (Optional)</label>
-                        <input type="email" id="email" class="form-control" placeholder="john@example.com">
-                    </div>
-                    <button type="submit" class="submit-btn">Register Customer</button>
-                </form>
-            </div>
-        </section>
-    </div>
-
-    <!-- WHATSAPP MODAL -->
-    <div id="waModal" class="modal-overlay">
-        <div class="modal-card">
-            <div class="modal-header">
-                <h3>📱 WhatsApp Notification</h3>
-                <button class="btn-secondary" onclick="closeWaModal()" style="padding: 0.2rem 0.5rem;">✕</button>
-            </div>
-            <div class="modal-body">
-                <div style="font-size: 0.9rem; margin-bottom: 0.8rem; color: var(--text-muted);">
-                    Recipient: <strong id="waCustomerName" style="color: var(--text-main);">Customer</strong> 
-                    (<span id="waCustomerPhone">Phone</span>)
-                    <br>
-                    Due Balance: <strong style="color: var(--accent-red);">KES <span id="waAmount">0</span></strong>
-                </div>
-
-                <div class="form-group">
-                    <label for="waMsgType">Select Message Template</label>
-                    <select id="waMsgType" class="form-control" onchange="generateWaMessage()">
-                        <option value="invoice">📋 Invoice Notification</option>
-                        <option value="reminder">🔔 Payment Reminder</option>
-                        <option value="alert">⚠️ Urgent Overdue Alert</option>
-                        <option value="receipt">✅ Payment Received Receipt</option>
-                        <option value="welcome">👋 New Customer Welcome</option>
-                    </select>
-                </div>
-
-                <div class="wa-preview-box">
-                    <div id="waMessageText">Generating preview...</div>
-                    <div style="text-align: right; font-size: 0.7rem; color: #8696a0; margin-top: 0.5rem;" id="waTime">12:00 PM</div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn-secondary" onclick="copyWaMessage()">Copy Text</button>
-                <button class="action-btn whatsapp" onclick="openWhatsApp()" style="padding: 0.6rem 1.2rem;">Send via WhatsApp</button>
-            </div>
+  <!-- TOP HEADER -->
+  <header class="bg-blue-700 text-white shadow-lg p-4">
+    <div class="container mx-auto flex flex-col md:flex-row justify-between items-center">
+      <div class="flex items-center space-x-3 mb-2 md:mb-0">
+        <span class="text-3xl">💧</span>
+        <div>
+          <h1 class="text-2xl font-bold">Joy Water Supplies</h1>
+          <p class="text-xs text-blue-200">Mlolongo Utility Management System</p>
         </div>
+      </div>
+      <!-- NAVIGATION TABS -->
+      <nav class="flex space-x-2 overflow-x-auto">
+        <button onclick="switchTab('dashboard')" id="tab-dashboard" class="tab-btn px-4 py-2 rounded-lg font-medium text-sm bg-blue-800 hover:bg-blue-600 transition">Dashboard</button>
+        <button onclick="switchTab('recordReading')" id="tab-recordReading" class="tab-btn px-4 py-2 rounded-lg font-medium text-sm hover:bg-blue-600 transition">Record Reading</button>
+        <button onclick="switchTab('customers')" id="tab-customers" class="tab-btn px-4 py-2 rounded-lg font-medium text-sm hover:bg-blue-600 transition">Customers</button>
+        <button onclick="switchTab('debtors')" id="tab-debtors" class="tab-btn px-4 py-2 rounded-lg font-medium text-sm hover:bg-blue-600 transition">Debtors</button>
+        <button onclick="switchTab('addCustomer')" id="tab-addCustomer" class="tab-btn px-4 py-2 rounded-lg font-medium text-sm hover:bg-blue-600 transition">+ Add Customer</button>
+      </nav>
     </div>
+  </header>
 
-    <script>
-        // ⚠️ REPLACE WITH YOUR APPS SCRIPT WEB APP URL ⚠️
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwpK9chdjn0UvkLLQq8u7H1DpLGep7SMSPYtxp41_hjvOIlydqRjfQYzPh6OXNzUSnd/exec';
+  <!-- MAIN CONTAINER -->
+  <main class="container mx-auto p-4 md:p-6">
 
-        function switchTab(tabName, event) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+    <!-- 1. DASHBOARD SECTION -->
+    <section id="section-dashboard" class="tab-content">
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="text-xl font-bold text-gray-800">Overview Dashboard</h2>
+        <button onclick="loadDashboard()" class="text-sm bg-gray-200 hover:bg-gray-300 text-gray-700 px-3 py-1 rounded">🔄 Refresh</button>
+      </div>
 
-            if (event && event.target) {
-                event.target.classList.add('active');
-            }
-            document.getElementById(tabName).classList.add('active');
+      <!-- METRIC CARDS -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <div class="bg-white p-5 rounded-xl shadow border-l-4 border-blue-500">
+          <p class="text-xs font-bold text-gray-500 uppercase tracking-wider">Total Revenue</p>
+          <p id="totalRevenueDisplay" class="text-2xl font-extrabold text-gray-800 mt-1">KES 0.00</p>
+        </div>
+        <div class="bg-white p-5 rounded-xl shadow border-l-4 border-green-500">
+          <p class="text-xs font-bold text-gray-500 uppercase tracking-wider">Total Collected</p>
+          <p id="totalCollectedDisplay" class="text-2xl font-extrabold text-green-600 mt-1">KES 0.00</p>
+        </div>
+        <div class="bg-white p-5 rounded-xl shadow border-l-4 border-red-500">
+          <p class="text-xs font-bold text-gray-500 uppercase tracking-wider">Outstanding Balance</p>
+          <p id="outstandingBalanceDisplay" class="text-2xl font-extrabold text-red-600 mt-1">KES 0.00</p>
+        </div>
+        <div class="bg-white p-5 rounded-xl shadow border-l-4 border-purple-500">
+          <p class="text-xs font-bold text-gray-500 uppercase tracking-wider">Collection Rate</p>
+          <p id="collectionRateDisplay" class="text-2xl font-extrabold text-purple-600 mt-1">0.0%</p>
+        </div>
+      </div>
+    </section>
 
-            if (tabName === 'dashboard') loadDashboard();
-            if (tabName === 'debtors') loadDebtors();
-            if (tabName === 'customers') loadCustomers();
-        }
+    <!-- 2. RECORD METER READING SECTION -->
+    <section id="section-recordReading" class="tab-content hidden">
+      <div class="max-w-xl mx-auto bg-white rounded-xl shadow-md p-6">
+        <h2 class="text-xl font-bold text-gray-800 mb-4 border-b pb-2">Record Meter Reading</h2>
+        
+        <form id="meterReadingForm" onsubmit="recordReading(event)">
+          <!-- Select Customer -->
+          <div class="mb-4">
+            <label class="block text-sm font-semibold text-gray-700 mb-1">Customer / Meter</label>
+            <select id="customerSelect" onchange="onCustomerSelectChange()" class="w-full border rounded-lg p-2.5 bg-gray-50 focus:ring-2 focus:ring-blue-500" required>
+              <option value="">-- Loading customers... --</option>
+            </select>
+          </div>
 
-        function showMessage(elementId, message, isError = false) {
-            const el = document.getElementById(elementId);
-            if (!el) return;
-            el.innerHTML = `<div class="message ${isError ? 'error' : 'success'}">${message}</div>`;
-            setTimeout(() => { el.innerHTML = ''; }, 5000);
-        }
+          <!-- Previous Reading (Read-only) -->
+          <div class="mb-4">
+            <label class="block text-sm font-semibold text-gray-700 mb-1">Previous Reading (m³)</label>
+            <input type="number" id="prevReadingInput" readonly disabled value="0" class="w-full border rounded-lg p-2.5 bg-gray-100 font-semibold text-gray-600">
+          </div>
 
-        // ==========================================
-        // DASHBOARD
-        // ==========================================
-        async function loadDashboard() {
-            try {
-                const response = await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                    body: JSON.stringify({ action: 'getDashboard' })
-                });
+          <!-- Current Reading Input -->
+          <div class="mb-2">
+            <label class="block text-sm font-semibold text-gray-700 mb-1">Current Reading (m³)</label>
+            <input type="number" id="currentReadingInput" step="0.01" oninput="calculateConsumption()" placeholder="Enter current reading" class="w-full border rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500" required>
+          </div>
 
-                const text = await response.text();
-                if (text.trim().startsWith('<')) throw new Error("Server error");
+          <!-- Rollover Checkbox -->
+          <div class="mb-4 flex items-center mt-2">
+            <input type="checkbox" id="isRolloverCheckbox" onchange="calculateConsumption()" class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500">
+            <label for="isRolloverCheckbox" class="ml-2 text-sm font-medium text-gray-700 select-none">
+              Meter replaced or reset (Rollover)
+            </label>
+          </div>
 
-                const data = JSON.parse(text);
+          <!-- Live Preview Box -->
+          <div class="p-4 bg-blue-50 border border-blue-200 rounded-lg mb-6">
+            <div class="text-sm text-gray-700">
+              Calculated Consumption: <span id="consumptionPreview" class="text-gray-500 font-bold">0 m³</span>
+            </div>
+            <div class="text-sm text-gray-700 mt-1">
+              Estimated Bill: <span id="costPreview" class="text-blue-700 font-extrabold text-base">KSh 0.00</span>
+            </div>
+          </div>
 
-                if (data.success) {
-                    document.getElementById('total-revenue').innerText = (data.financials?.totalRevenue || 0).toLocaleString();
-                    document.getElementById('total-collected').innerText = (data.financials?.totalCollected || 0).toLocaleString();
-                    document.getElementById('total-outstanding').innerText = (data.financials?.outstandingBalance || 0).toLocaleString();
-                    document.getElementById('collection-rate').innerText = (data.financials?.collectionRate || 0).toFixed(1);
-                }
-            } catch (err) {
-                console.error('Dashboard error:', err);
-            }
-        }
+          <!-- Submit Button -->
+          <button type="submit" id="submitReadingBtn" class="w-full bg-blue-600 text-white font-bold py-3 rounded-lg hover:bg-blue-700 transition shadow">
+            Record Reading & Generate Invoice
+          </button>
+        </form>
+      </div>
+    </section>
 
-        // ==========================================
-        // ADD CUSTOMER
-        // ==========================================
-        async function addCustomer(event) {
-            event.preventDefault();
+    <!-- 3. CUSTOMERS SECTION -->
+    <section id="section-customers" class="tab-content hidden">
+      <div class="bg-white rounded-xl shadow p-6">
+        <h2 class="text-xl font-bold text-gray-800 mb-4">Customer Directory</h2>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="bg-gray-100 border-b text-xs font-semibold text-gray-600 uppercase">
+                <th class="p-3">Customer ID</th>
+                <th class="p-3">Name</th>
+                <th class="p-3">Phone</th>
+                <th class="p-3">Location</th>
+                <th class="p-3">Last Reading</th>
+              </tr>
+            </thead>
+            <tbody id="customersTableBody" class="divide-y text-sm">
+              <tr><td colspan="5" class="p-4 text-center text-gray-500">Loading customers...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
 
-            const payload = {
-                action: 'createCustomer',
-                phone: document.getElementById('phone').value,
-                name: document.getElementById('name').value,
-                type: document.getElementById('type').value,
-                meterNumber: document.getElementById('meterNumber').value,
-                location: document.getElementById('location').value,
-                email: document.getElementById('email').value
-            };
+    <!-- 4. DEBTORS SECTION -->
+    <section id="section-debtors" class="tab-content hidden">
+      <div class="bg-white rounded-xl shadow p-6">
+        <h2 class="text-xl font-bold text-gray-800 mb-4">Debtors & Unpaid Invoices</h2>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="bg-red-50 border-b text-xs font-semibold text-red-700 uppercase">
+                <th class="p-3">Customer</th>
+                <th class="p-3">Phone</th>
+                <th class="p-3">Invoice ID</th>
+                <th class="p-3">Amount Due</th>
+              </tr>
+            </thead>
+            <tbody id="debtorsTableBody" class="divide-y text-sm">
+              <tr><td colspan="4" class="p-4 text-center text-gray-500">Loading debtors list...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
 
-            try {
-                const response = await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                    body: JSON.stringify(payload)
-                });
+    <!-- 5. ADD CUSTOMER SECTION -->
+    <section id="section-addCustomer" class="tab-content hidden">
+      <div class="max-w-xl mx-auto bg-white rounded-xl shadow-md p-6">
+        <h2 class="text-xl font-bold text-gray-800 mb-4 border-b pb-2">Add New Customer</h2>
+        <form onsubmit="createCustomer(event)">
+          <div class="mb-4">
+            <label class="block text-sm font-semibold text-gray-700 mb-1">Full Name</label>
+            <input type="text" id="newCustomerName" class="w-full border rounded-lg p-2.5" required>
+          </div>
+          <div class="mb-4">
+            <label class="block text-sm font-semibold text-gray-700 mb-1">Phone Number</label>
+            <input type="text" id="newCustomerPhone" placeholder="07XXXXXXXX" class="w-full border rounded-lg p-2.5" required>
+          </div>
+          <div class="mb-4">
+            <label class="block text-sm font-semibold text-gray-700 mb-1">Location / House No.</label>
+            <input type="text" id="newCustomerLocation" class="w-full border rounded-lg p-2.5" required>
+          </div>
+          <div class="mb-6">
+            <label class="block text-sm font-semibold text-gray-700 mb-1">Meter Serial Number</label>
+            <input type="text" id="newCustomerMeter" class="w-full border rounded-lg p-2.5" required>
+          </div>
+          <button type="submit" class="w-full bg-green-600 text-white font-bold py-3 rounded-lg hover:bg-green-700 transition shadow">
+            Save Customer
+          </button>
+        </form>
+      </div>
+    </section>
 
-                const text = await response.text();
-                if (text.trim().startsWith('<')) throw new Error("Server returned HTML");
+  </main>
 
-                const result = JSON.parse(text);
+  <!-- ALL JAVASCRIPT LOGIC MUST STAY INSIDE THIS SCRIPT TAG -->
+  <script>
+    // -------------------------------------------------------------
+    // CONFIGURATION & GLOBAL STATE
+    // -------------------------------------------------------------
+    // REPLACE THIS WITH YOUR DEPLOYED GOOGLE APPS SCRIPT EXEC URL
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz_REPLACE_WITH_YOUR_EXEC_URL/exec";
 
-                if (result.success) {
-                    showMessage('add-customer-message', `✅ Customer ${result.customerId} added successfully!`);
-                    event.target.reset();
-                    loadDashboard();
-                } else {
-                    showMessage('add-customer-message', '❌ ' + (result.message || 'Error'), true);
-                }
-            } catch (err) {
-                console.error('Error:', err);
-                showMessage('add-customer-message', '❌ ' + err.message, true);
-            }
-        }
+    // Global Registry (Declared ONCE)
+    let globalCustomersList = [];
 
-        // ==========================================
-        // DEBTORS
-        // ==========================================
-        async function loadDebtors() {
-            try {
-                const response = await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                    body: JSON.stringify({ action: 'getDebtors' })
-                });
-
-                const text = await response.text();
-                if (text.trim().startsWith('<')) throw new Error("Server error");
-
-                const data = JSON.parse(text);
-                const tbody = document.getElementById('debtors-list');
-
-                if (data.success && data.debtors && data.debtors.length > 0) {
-                    tbody.innerHTML = data.debtors.map((d, i) => {
-                        const safeName = (d.name || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'");
-                        const safePhone = (d.phone || '').replace(/'/g, "\\'");
-                        const safeInvoice = (d.invoiceId || '').replace(/'/g, "\\'");
-                        const safeMeter = (d.meterNumber || '').replace(/'/g, "\\'");
-
-                        return `
-                        <tr>
-                            <td>${i + 1}</td>
-                            <td>${d.name}</td>
-                            <td>${d.phone}</td>
-                            <td>${d.meterNumber || '-'}</td>
-                            <td style="color: #ff6b6b; font-weight: bold;">KES ${(d.amountDue || 0).toLocaleString()}</td>
-                            <td>${d.invoiceId}</td>
-                            <td>
-                                <button class="action-btn whatsapp" onclick="openWaModal(
-                                    '${safePhone}',
-                                    '${safeName}',
-                                    ${d.amountDue || 0},
-                                    '${safeInvoice}',
-                                    '${safeMeter}',
-                                    'Overdue'
-                                )">📱 WhatsApp</button>
-                            </td>
-                        </tr>`;
-                    }).join('');
-                } else {
-                    tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 2rem; color: var(--text-muted);">No debtors found</td></tr>';
-                }
-            } catch (err) {
-                console.error('Debtors error:', err);
-            }
-        }
-
-        // ==========================================
-        // CUSTOMERS LIST
-        // ==========================================
-      // CUSTOMERS LIST
-// ==========================================
-// Global customer registry (declared ONCE)
-let globalCustomersList = [];
-
-// Load customers from backend
-async function loadCustomers() {
-  try {
-    const response = await fetch(SCRIPT_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify({ action: 'loadCustomers' })
-    });
-    
-    const result = await response.json();
-    
-    if (result.success || Array.isArray(result.data) || Array.isArray(result)) {
-      globalCustomersList = result.data || result;
-      populateCustomerDropdown(globalCustomersList);
-    } else {
-      console.error('Failed to load customers:', result.message || result);
-    }
-  } catch (err) {
-    console.error('Error loading customers:', err);
-  }
-}
-
-// Populate customer dropdown and set up event listeners
-function populateCustomerDropdown(customers) {
-  const select = document.getElementById('customerSelect');
-  if (!select) return;
-
-  select.innerHTML = '<option value="">-- Select Customer --</option>';
-  
-  customers.forEach(c => {
-    const opt = document.createElement('option');
-    opt.value = c.id || c.customerId;
-    opt.textContent = `${c.name || 'Unknown'} (${c.meterNumber || c.phone || 'No Meter'})`;
-    select.appendChild(opt);
-  });
-}
-
-// Selection change handler for populating previous reading
-function onCustomerSelectChange() {
-  const selectElement = document.getElementById('customerSelect');
-  if (!selectElement) return;
-
-  const selectedCustomerId = selectElement.value;
-  const customer = globalCustomersList.find(c => (c.id || c.customerId) === selectedCustomerId);
-  
-  const prevInput = document.getElementById('prevReadingInput');
-  if (prevInput) {
-    prevInput.value = (customer && customer.lastReading !== undefined) ? customer.lastReading : 0;
-  }
-  
-  if (typeof calculateConsumption === 'function') {
-    calculateConsumption();
-  }
-}
-        // ==========================================
-        // METER READING
-        // ==========================================
-        async function recordReading(event) {
-  if (event) event.preventDefault();
-  
-  const customerId = document.getElementById('customerSelect').value;
-  const reading = document.getElementById('currentReadingInput').value;
-  
-  if (!customerId || !reading) {
-    alert("Please select a customer and enter a meter reading.");
-    return;
-  }
-
-  const payload = {
-    action: 'recordMeterReading',
-    customerId: customerId,
-    reading: reading,
-    recordedBy: 'Admin'
-  };
-
-  try {
-    const response = await fetch(SCRIPT_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify(payload)
-    });
-
-    const result = await response.json();
-
-    if (result.success) {
-      alert(`✅ ${result.message}\nInvoice ID: ${result.invoiceId}`);
-      // Refresh list to update previous readings baseline
+    // -------------------------------------------------------------
+    // INITIALIZATION & TAB NAVIGATION
+    // -------------------------------------------------------------
+    document.addEventListener("DOMContentLoaded", () => {
+      loadDashboard();
       loadCustomers();
-    } else {
-      alert(`❌ Error: ${result.message}`);
+    });
+
+    function switchTab(tabName) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('bg-blue-800'));
+
+      const activeSection = document.getElementById(`section-${tabName}`);
+      const activeTabBtn = document.getElementById(`tab-${tabName}`);
+
+      if (activeSection) activeSection.classList.remove('hidden');
+      if (activeTabBtn) activeTabBtn.classList.add('bg-blue-800');
+
+      if (tabName === 'dashboard') loadDashboard();
+      if (tabName === 'debtors') loadDebtors();
     }
-  } catch (err) {
-    console.error('Error in recordReading:', err);
-    alert('Server returned an unexpected response. Check Google Apps Script deployment.');
-  }
-}
-        // ==========================================
-        // WHATSAPP MODAL LOGIC
-        // ==========================================
-        let currentWaData = {
-            phone: "",
-            name: "",
-            amount: 0,
-            invoiceId: "",
-            meterNumber: "",
-            status: ""
-        };
 
-        function openWaModal(phone, name, amount, invoiceId, meterNumber, status) {
-            currentWaData = {
-                phone: phone || "+254768789382",
-                name: name || "Valued Customer",
-                amount: amount || 0,
-                invoiceId: invoiceId || "INV-000",
-                meterNumber: meterNumber || "M-00000",
-                status: status || "Unpaid"
-            };
-
-            document.getElementById('waCustomerPhone').innerText = currentWaData.phone;
-            document.getElementById('waCustomerName').innerText = currentWaData.name;
-            document.getElementById('waAmount').innerText = currentWaData.amount.toLocaleString();
-
-            generateWaMessage();
-            document.getElementById('waModal').style.display = 'flex';
-        }
-
-        function closeWaModal() {
-            document.getElementById('waModal').style.display = 'none';
-        }
-
-        function generateWaMessage() {
-            const msgType = document.getElementById('waMsgType').value;
-            const { name, amount, invoiceId, meterNumber } = currentWaData;
-            
-            let message = "";
-
-            switch(msgType) {
-                case 'invoice':
-                    message = `*📋 WATER BILL NOTIFICATION*\n\nHello ${name},\n\nYour invoice for water services is ready:\n*Invoice ID:* ${invoiceId}\n*Meter Number:* ${meterNumber}\n*Amount Due:* KES ${amount.toLocaleString()}\n*Due Date:* Within 15 days\n\n*Pay via M-Pesa Till:* 4984254\n*Business Name:* Joy Water Supplies\n\nThank you for being a valued customer! 🙏`;
-                    break;
-
-                case 'reminder':
-                    message = `*🔔 PAYMENT REMINDER*\n\nHello ${name},\n\nThis is a friendly reminder that your water bill is due:\n*Invoice ID:* ${invoiceId}\n*Amount Due:* KES ${amount.toLocaleString()}\n\nPlease pay via M-Pesa Till: *4984254*\nAccount Name: Joy Water Supplies\n\nThank you! 💧`;
-                    break;
-
-                case 'receipt':
-                    message = `*✅ PAYMENT RECEIVED*\n\nHello ${name},\n\nThank you for your payment! 🙏\n*Invoice ID:* ${invoiceId}\n*Amount Paid:* KES ${amount.toLocaleString()}\n*Date:* ${new Date().toLocaleDateString()}\n\nYour account is now up to date.\nFor any issues, contact us at +254768789382`;
-                    break;
-
-                case 'alert':
-                    message = `*⚠️ URGENT: BILL ALERT*\n\nHello ${name},\n\nYour water bill is overdue:\n*Invoice ID:* ${invoiceId}\n*Amount Due:* KES ${amount.toLocaleString()}\n*Meter:* ${meterNumber}\n\nPlease settle immediately to avoid service disconnection.\nPay via M-Pesa Till: *4984254*\n\nContact us: +254768789382`;
-                    break;
-
-                case 'welcome':
-                    message = `*👋 WELCOME TO JOY WATER SUPPLIES!*\n\nHello ${name},\n\nThank you for choosing our services! We're excited to serve you.\n\n*Meter Number:* ${meterNumber}\n*Contact:* +254768789382\n*Location:* Mlolongo, Kenya\n\nFor support, WhatsApp us anytime.\nEnjoy fresh water! 💧`;
-                    break;
-            }
-
-            document.getElementById('waMessageText').innerText = message;
-            document.getElementById('waTime').innerText = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        }
-
-        function openWhatsApp() {
-            const message = document.getElementById('waMessageText').innerText;
-            const encodedMsg = encodeURIComponent(message);
-            let phone = currentWaData.phone.replace(/[^0-9]/g, '');
-            
-            // Format local numbers (e.g., 0712345678 -> 254712345678)
-            if (phone.startsWith('0')) {
-                phone = '254' + phone.substring(1);
-            }
-            
-            const whatsappUrl = `https://wa.me/${phone}?text=${encodedMsg}`;
-            window.open(whatsappUrl, '_blank');
-        }
-
-        function copyWaMessage() {
-            const message = document.getElementById('waMessageText').innerText;
-            navigator.clipboard.writeText(message).then(() => {
-                alert('✅ Message copied! Open WhatsApp and paste.');
-            }).catch(err => {
-                console.error('Failed to copy:', err);
-                alert('Copy failed. Please try again.');
-            });
-        }
-
-        document.getElementById('waModal')?.addEventListener('click', function(event) {
-            if (event.target === this) {
-                closeWaModal();
-            }
+    // -------------------------------------------------------------
+    // 1. DASHBOARD LOGIC
+    // -------------------------------------------------------------
+    async function loadDashboard() {
+      try {
+        const response = await fetch(SCRIPT_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({ action: 'getDashboard' })
         });
 
-        // Initialize default reading date to today
-        document.getElementById('readingDate').valueAsDate = new Date();
+        const result = await response.json();
 
-        // Initialize dashboard on load
-        window.addEventListener('DOMContentLoaded', () => {
-            loadDashboard();
+        if (result.success || result.totalRevenue !== undefined) {
+          renderDashboardUI(result);
+        } else {
+          console.error("Dashboard error:", result.error || result);
+        }
+      } catch (err) {
+        console.error("Error loading dashboard:", err);
+      }
+    }
+
+    function renderDashboardUI(data) {
+      if (!data) return;
+
+      const formatKES = (val) => `KES ${(Number(val) || 0).toLocaleString('en-KE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+      document.getElementById('totalRevenueDisplay').textContent = formatKES(data.totalRevenue);
+      document.getElementById('totalCollectedDisplay').textContent = formatKES(data.totalCollected);
+      document.getElementById('outstandingBalanceDisplay').textContent = formatKES(data.outstandingBalance);
+      document.getElementById('collectionRateDisplay').textContent = `${(Number(data.collectionRate) || 0).toFixed(1)}%`;
+    }
+
+    // -------------------------------------------------------------
+    // 2. CUSTOMERS FETCH & DROPDOWN LOGIC
+    // -------------------------------------------------------------
+    async function loadCustomers() {
+      try {
+        const response = await fetch(SCRIPT_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({ action: 'loadCustomers' })
         });
-    </script>
+
+        const result = await response.json();
+
+        if (result.success || Array.isArray(result.data) || Array.isArray(result)) {
+          globalCustomersList = result.data || result;
+          populateCustomerDropdown(globalCustomersList);
+          renderCustomersTable(globalCustomersList);
+        } else {
+          console.error('Failed to load customers:', result.message || result);
+        }
+      } catch (err) {
+        console.error('Error loading customers:', err);
+      }
+    }
+
+    function populateCustomerDropdown(customers) {
+      const select = document.getElementById('customerSelect');
+      if (!select) return;
+
+      select.innerHTML = '<option value="">-- Select Customer --</option>';
+
+      if (Array.isArray(customers)) {
+        customers.forEach(c => {
+          const opt = document.createElement('option');
+          opt.value = c.id || c.customerId;
+          opt.textContent = `${c.name || 'Unknown'} (${c.meterNumber || c.phone || 'No Meter'})`;
+          select.appendChild(opt);
+        });
+      }
+    }
+
+    function renderCustomersTable(customers) {
+      const tbody = document.getElementById('customersTableBody');
+      if (!tbody) return;
+
+      if (!Array.isArray(customers) || customers.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-gray-500">No customers found.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = customers.map(c => `
+        <tr class="hover:bg-gray-50">
+          <td class="p-3 font-mono text-xs">${c.id || c.customerId || '-'}</td>
+          <td class="p-3 font-semibold">${c.name || 'N/A'}</td>
+          <td class="p-3">${c.phone || 'N/A'}</td>
+          <td class="p-3">${c.location || 'N/A'}</td>
+          <td class="p-3 font-bold text-blue-600">${c.lastReading !== undefined ? c.lastReading + ' m³' : '0 m³'}</td>
+        </tr>
+      `).join('');
+    }
+
+    function onCustomerSelectChange() {
+      const selectElement = document.getElementById('customerSelect');
+      if (!selectElement) return;
+
+      const selectedCustomerId = selectElement.value;
+      const customer = globalCustomersList.find(c => (c.id || c.customerId) === selectedCustomerId);
+
+      const prevInput = document.getElementById('prevReadingInput');
+      if (prevInput) {
+        prevInput.value = (customer && customer.lastReading !== undefined) ? customer.lastReading : 0;
+      }
+
+      calculateConsumption();
+    }
+
+    // -------------------------------------------------------------
+    // 3. LIVE CONSUMPTION & ROLLOVER CALCULATION
+    // -------------------------------------------------------------
     function calculateConsumption() {
-  // 1. Get references to HTML elements
-  const prevInput = document.getElementById('prevReadingInput');
-  const currInput = document.getElementById('currentReadingInput');
-  const rolloverCheck = document.getElementById('isRolloverCheckbox');
-  const consumptionDisplay = document.getElementById('consumptionPreview');
-  const costDisplay = document.getElementById('costPreview');
-  const submitBtn = document.getElementById('submitReadingBtn');
+      const prevInput = document.getElementById('prevReadingInput');
+      const currInput = document.getElementById('currentReadingInput');
+      const rolloverCheck = document.getElementById('isRolloverCheckbox');
+      const consumptionDisplay = document.getElementById('consumptionPreview');
+      const costDisplay = document.getElementById('costPreview');
+      const submitBtn = document.getElementById('submitReadingBtn');
 
-  if (!prevInput || !currInput || !consumptionDisplay) return;
+      if (!prevInput || !currInput || !consumptionDisplay) return;
 
-  // 2. Read values
-  const previous = parseFloat(prevInput.value) || 0;
-  const currentVal = currInput.value.trim();
-  const isRollover = rolloverCheck ? rolloverCheck.checked : false;
+      const previous = parseFloat(prevInput.value) || 0;
+      const currentVal = currInput.value.trim();
+      const isRollover = rolloverCheck ? rolloverCheck.checked : false;
 
-  // 3. Handle empty input (User hasn't typed anything yet)
-  if (currentVal === "") {
-    consumptionDisplay.textContent = "0 m³";
-    consumptionDisplay.className = "text-gray-500 font-bold";
-    if (costDisplay) costDisplay.textContent = "KSh 0.00";
-    if (submitBtn) submitBtn.disabled = false;
-    return;
-  }
+      // Empty input state
+      if (currentVal === "") {
+        consumptionDisplay.textContent = "0 m³";
+        consumptionDisplay.className = "text-gray-500 font-bold";
+        if (costDisplay) costDisplay.textContent = "KSh 0.00";
+        if (submitBtn) submitBtn.disabled = false;
+        return;
+      }
 
-  // 4. Validate numeric input
-  const current = parseFloat(currentVal);
+      const current = parseFloat(currentVal);
 
-  if (isNaN(current)) {
-    consumptionDisplay.textContent = "Invalid entry";
-    consumptionDisplay.className = "text-red-500 font-bold";
-    if (costDisplay) costDisplay.textContent = "KSh 0.00";
-    if (submitBtn) submitBtn.disabled = true;
-    return;
-  }
+      if (isNaN(current)) {
+        consumptionDisplay.textContent = "Invalid entry";
+        consumptionDisplay.className = "text-red-500 font-bold";
+        if (costDisplay) costDisplay.textContent = "KSh 0.00";
+        if (submitBtn) submitBtn.disabled = true;
+        return;
+      }
 
-  // 5. Calculate consumption & validate against previous reading
-  let consumption = 0;
-  const RATE_PER_UNIT = 150; // Rate in KSh per m³ (adjust as needed)
+      let consumption = 0;
+      const RATE_PER_UNIT = 150; // Standard water rate per m³
 
-  if (isRollover) {
-    // Rollover/Reset mode: treat entire current reading as new consumption
-    consumption = current;
-    consumptionDisplay.textContent = `${consumption.toFixed(2)} m³ (Meter Reset / Rollover Active)`;
-    consumptionDisplay.className = "text-amber-600 font-bold";
-    if (submitBtn) submitBtn.disabled = false;
-  } else {
-    consumption = current - previous;
+      if (isRollover) {
+        // Meter reset/rollover mode
+        consumption = current;
+        consumptionDisplay.textContent = `${consumption.toFixed(2)} m³ (Meter Reset / Rollover Active)`;
+        consumptionDisplay.className = "text-amber-600 font-bold";
+        if (submitBtn) submitBtn.disabled = false;
+      } else {
+        consumption = current - previous;
 
-    if (consumption < 0) {
-      // Error: Reading dropped without checking rollover
-      consumptionDisplay.textContent = `${consumption.toFixed(2)} m³ (Error: Reading lower than previous. Check 'Meter replaced' if intended)`;
-      consumptionDisplay.className = "text-red-600 font-bold";
-      if (costDisplay) costDisplay.textContent = "KSh 0.00";
-      if (submitBtn) submitBtn.disabled = true; // Prevent submission of invalid data
-      return;
-    } else {
-      // Normal positive consumption
-      consumptionDisplay.textContent = `${consumption.toFixed(2)} m³`;
-      consumptionDisplay.className = "text-green-600 font-bold";
-      if (submitBtn) submitBtn.disabled = false;
+        if (consumption < 0) {
+          consumptionDisplay.textContent = `${consumption.toFixed(2)} m³ (Error: Reading lower than previous. Check 'Meter replaced' if intended)`;
+          consumptionDisplay.className = "text-red-600 font-bold";
+          if (costDisplay) costDisplay.textContent = "KSh 0.00";
+          if (submitBtn) submitBtn.disabled = true;
+          return;
+        } else {
+          consumptionDisplay.textContent = `${consumption.toFixed(2)} m³`;
+          consumptionDisplay.className = "text-green-600 font-bold";
+          if (submitBtn) submitBtn.disabled = false;
+        }
+      }
+
+      if (costDisplay) {
+        const estimatedCost = consumption * RATE_PER_UNIT;
+        costDisplay.textContent = `KSh ${estimatedCost.toLocaleString('en-KE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+      }
     }
-  }
 
-  // 6. Update cost preview
-  if (costDisplay) {
-    const estimatedCost = consumption * RATE_PER_UNIT;
-    costDisplay.textContent = `KSh ${estimatedCost.toLocaleString('en-KE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-  }
-}
-</script>
+    // -------------------------------------------------------------
+    // 4. RECORD READING SUBMISSION
+    // -------------------------------------------------------------
+    async function recordReading(event) {
+      if (event) event.preventDefault();
+
+      const customerSelect = document.getElementById('customerSelect');
+      const readingInput = document.getElementById('currentReadingInput');
+      const rolloverCheck = document.getElementById('isRolloverCheckbox');
+      const submitBtn = document.getElementById('submitReadingBtn');
+
+      const customerId = customerSelect ? customerSelect.value : '';
+      const reading = readingInput ? readingInput.value.trim() : '';
+      const isRollover = rolloverCheck ? rolloverCheck.checked : false;
+
+      if (!customerId || reading === '') {
+        alert("Please select a customer and enter a meter reading.");
+        return;
+      }
+
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = "Recording...";
+      }
+
+      const payload = {
+        action: 'recordMeterReading',
+        customerId: customerId,
+        reading: reading,
+        isRollover: isRollover,
+        recordedBy: 'Admin'
+      };
+
+      try {
+        const response = await fetch(SCRIPT_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify(payload)
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+          alert(`✅ ${result.message || 'Reading recorded successfully!'}\nInvoice ID: ${result.invoiceId || 'N/A'}`);
+          
+          // Reset Form
+          readingInput.value = '';
+          if (rolloverCheck) rolloverCheck.checked = false;
+          
+          await loadCustomers(); // Refresh baseline readings
+          switchTab('dashboard'); // Redirect to dashboard
+        } else {
+          alert(`❌ Error: ${result.message || 'Failed to record reading'}`);
+        }
+      } catch (err) {
+        console.error('Error recording reading:', err);
+        alert('Server communication error. Ensure Apps Script Web App is deployed to "Anyone".');
+      } finally {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.textContent = "Record Reading & Generate Invoice";
+        }
+      }
+    }
+
+    // -------------------------------------------------------------
+    // 5. DEBTORS LOGIC
+    // -------------------------------------------------------------
+    async function loadDebtors() {
+      try {
+        const response = await fetch(SCRIPT_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({ action: 'getDebtors' })
+        });
+
+        const result = await response.json();
+        const tbody = document.getElementById('debtorsTableBody');
+
+        if (result.success && Array.isArray(result.data)) {
+          if (result.data.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-gray-500">No debtors found. All accounts clear!</td></tr>';
+            return;
+          }
+
+          tbody.innerHTML = result.data.map(d => `
+            <tr class="hover:bg-red-50">
+              <td class="p-3 font-semibold">${d.customerName || d.customerId}</td>
+              <td class="p-3">${d.phone || 'N/A'}</td>
+              <td class="p-3 font-mono text-xs">${d.invoiceId}</td>
+              <td class="p-3 font-bold text-red-600">KES ${(Number(d.amount) || 0).toLocaleString()}</td>
+            </tr>
+          `).join('');
+        }
+      } catch (err) {
+        console.error("Error loading debtors:", err);
+      }
+    }
+
+    // -------------------------------------------------------------
+    // 6. CREATE CUSTOMER LOGIC
+    // -------------------------------------------------------------
+    async function createCustomer(event) {
+      if (event) event.preventDefault();
+
+      const name = document.getElementById('newCustomerName').value;
+      const phone = document.getElementById('newCustomerPhone').value;
+      const location = document.getElementById('newCustomerLocation').value;
+      const meterNumber = document.getElementById('newCustomerMeter').value;
+
+      const payload = {
+        action: 'createCustomer',
+        name, phone, location, meterNumber,
+        type: 'Residential', email: ''
+      };
+
+      try {
+        const response = await fetch(SCRIPT_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify(payload)
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+          alert('✅ Customer added successfully!');
+          await loadCustomers();
+          switchTab('customers');
+        } else {
+          alert('❌ Error: ' + (result.message || 'Failed to add customer'));
+        }
+      } catch (err) {
+        console.error("Error creating customer:", err);
+        alert('Server communication error.');
+      }
+    }
+  </script>
 </body>
 </html>
