@@ -507,40 +507,58 @@
     // 6. CREATE CUSTOMER LOGIC
     // -------------------------------------------------------------
     async function createCustomer(event) {
-      if (event) event.preventDefault();
+  if (event) event.preventDefault();
 
-      const name = document.getElementById('newCustomerName').value;
-      const phone = document.getElementById('newCustomerPhone').value;
-      const location = document.getElementById('newCustomerLocation').value;
-      const meterNumber = document.getElementById('newCustomerMeter').value;
+  const btn = document.getElementById('addCustomerBtn');
+  const name = document.getElementById('newCustomerName').value.trim();
+  const phone = document.getElementById('newCustomerPhone').value.trim();
+  const type = document.getElementById('newCustomerType').value;
+  const location = document.getElementById('newCustomerLocation').value.trim();
+  const meterNumber = document.getElementById('newCustomerMeter').value.trim();
 
-      const payload = {
-        action: 'createCustomer',
-        name, phone, location, meterNumber,
-        type: 'Residential', email: ''
-      };
+  // Prevent double click submission
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = "Saving Customer...";
+  }
 
-      try {
-        const response = await fetch(SCRIPT_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify(payload)
-        });
+  const payload = {
+    action: 'createCustomer',
+    name: name,
+    phone: phone,
+    type: type,
+    location: location,
+    meterNumber: meterNumber,
+    email: '',
+    notes: ''
+  };
 
-        const result = await response.json();
+  try {
+    const response = await fetch(SCRIPT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(payload)
+    });
 
-        if (result.success) {
-          alert('✅ Customer added successfully!');
-          await loadCustomers();
-          switchTab('customers');
-        } else {
-          alert('❌ Error: ' + (result.message || 'Failed to add customer'));
-        }
-      } catch (err) {
-        console.error("Error creating customer:", err);
-        alert('Server communication error.');
-      }
+    const result = await response.json();
+
+    if (result.success) {
+      alert('✅ Customer added successfully!');
+      document.getElementById('addCustomerForm').reset();
+      await loadCustomers();
+      switchTab('customers');
+    } else {
+      alert('❌ Error: ' + (result.message || 'Failed to add customer'));
     }
-  </script>
+  } catch (err) {
+    console.error("Error creating customer:", err);
+    alert('Server communication error.');
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = "Save Customer";
+    }
+  }
+}  </script>
 </body>
 </html>
