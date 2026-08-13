@@ -286,21 +286,29 @@
       }
     }
 
-    function populateCustomerDropdown(customers) {
-      const select = document.getElementById('customerSelect');
-      if (!select) return;
+   function populateCustomerSelectDropdown(customers) {
+  const selectEl = document.getElementById("customerSelect"); // Ensure this matches your <select> ID
+  if (!selectEl) return;
 
-      select.innerHTML = '<option value="">-- Select Customer --</option>';
+  // Clear existing options first!
+  selectEl.innerHTML = '<option value="">-- Select Customer --</option>';
 
-      if (Array.isArray(customers)) {
-        customers.forEach(c => {
-          const opt = document.createElement('option');
-          opt.value = c.id || c.customerId;
-          opt.textContent = `${c.name || 'Unknown'} (${c.meterNumber || c.phone || 'No Meter'})`;
-          select.appendChild(opt);
-        });
-      }
+  // Use a Map to eliminate duplicate Customer IDs
+  const uniqueCustomers = new Map();
+  customers.forEach(c => {
+    if (c.customerId && !uniqueCustomers.has(c.customerId)) {
+      uniqueCustomers.set(c.customerId, c);
     }
+  });
+
+  uniqueCustomers.forEach(c => {
+    const option = document.createElement("option");
+    option.value = c.customerId;
+    const displayName = c.name && c.name !== "Customer" ? c.name : c.phone;
+    option.textContent = `${displayName} (${c.meterNumber || 'No Meter'})`;
+    selectEl.appendChild(option);
+  });
+}
 
     function renderCustomersTable(customers) {
       const tbody = document.getElementById('customersTableBody');
