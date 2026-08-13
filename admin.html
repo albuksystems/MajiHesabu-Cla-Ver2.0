@@ -582,6 +582,107 @@
           btn.textContent = "Save Customer";
         }
       }
+      // -------------------------------------------------------------
+// RECORD MANUAL PAYMENT (FRONTEND)
+// -------------------------------------------------------------
+async function recordManualPayment(event) {
+  if (event) event.preventDefault();
+
+  const customerId = document.getElementById('paymentCustomerSelect').value;
+  const invoiceId = document.getElementById('paymentInvoiceId').value.trim();
+  const amount = document.getElementById('paymentAmount').value.trim();
+  const paymentMode = document.getElementById('paymentMode').value;
+  const reference = document.getElementById('paymentReference').value.trim();
+  const submitBtn = document.getElementById('submitPaymentBtn');
+
+  if (!customerId || !amount) {
+    alert("Please select a customer and enter the amount paid.");
+    return;
+  }
+
+  if (submitBtn) {
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Processing Payment...";
+  }
+
+  const payload = {
+    action: 'recordPayment',
+    payload: {
+      customerId: customerId,
+      invoiceId: invoiceId,
+      amount: amount,
+      paymentMode: paymentMode,
+      reference: reference,
+      recordedBy: 'Admin'
+    }
+  };
+
+  try {
+    const response = await fetch(SCRIPT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(payload)
+    });
+
+    const result = await response.json();
+
+    if (result.success) {
+      alert(`✅ ${result.message}`);
+      
+      // Auto-trigger WhatsApp Receipt Prompt
+      const confirmWa = confirm("Would you like to send a payment confirmation receipt via WhatsApp?");
+      if (confirmWa) {
+        sendPaymentReceiptWhatsApp(customerId, amount, reference || result.paymentId);
+      }
+
+      document.getElementById('paymentForm').reset();
+      await loadCustomers();
+      switchTab('dashboard');
+    } else {
+      alert(`❌ Error: ${result.message}`);
+    }
+  } catch (err) {
+    console.error('Error recording payment:', err);
+    alert('Server communication error.');
+  } finally {
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.textContent = "Record Payment & Issue Receipt";
+    }
+  }
+}
+
+// -------------------------------------------------------------
+// WHATSAPP DISPATCH HELPERS (0-COST, NO API KEYS NEEDED)
+// -------------------------------------------------------------
+function sendPaymentReceiptWhatsApp(customerId, amount, ref) {
+  const customer = globalCustomersList.find(c => (c.id || c.customerId) === customerId);
+  if (!customer || !customer.phone) {
+    alert("Customer phone number not found.");
+    return;
+  }
+
+  let phone = customer.phone.replace(/[^0-9]/g, '');
+  if (phone.startsWith('0')) phone = '254' + phone.slice(1);
+
+  const text = `Hello ${customer.name || ''},\n\nPayment Received! Thank you for paying KES ${Number(amount).toLocaleString()} to Joy Water Supplies.\nReference: ${ref}\n\nThank you for your business!`;
+  
+  window.open(`https://wa.me/${phone}?text=${encodeURIComponent(text)}`, '_blank');
+}
+
+function sendDebtorReminderWhatsApp(phone, customerName, invoiceId, amountDue) {
+  if (!phone) {
+    alert("Phone number missing.");
+    return;
+  }
+
+  let formattedPhone = phone.replace(/[^0-9]/g, '');
+  if (formattedPhone.startsWith('0')) formattedPhone = '254' + formattedPhone.slice(1);
+
+  const text = `Hello ${customerName || 'Valued Customer'},\n\nThis is a friendly reminder from Joy Water Supplies regarding pending invoice ${invoiceId} for KES ${Number(amountDue).toLocaleString()}.\n\nKindly make payment via M-Pesa to clear your balance. Thank you!`;
+
+  window.open(`https://wa.me/${formattedPhone}?text=${encodeURIComponent(text)}`, '_blank');
+}
     }
   </script>
 </body>
