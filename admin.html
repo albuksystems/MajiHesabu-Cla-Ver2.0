@@ -23,6 +23,7 @@
       <nav class="flex space-x-2 overflow-x-auto">
         <button onclick="switchTab('dashboard')" id="tab-dashboard" class="tab-btn px-4 py-2 rounded-lg font-medium text-sm bg-blue-800 hover:bg-blue-600 transition">Dashboard</button>
         <button onclick="switchTab('recordReading')" id="tab-recordReading" class="tab-btn px-4 py-2 rounded-lg font-medium text-sm hover:bg-blue-600 transition">Record Reading</button>
+        <button onclick="switchTab('recordPayment')" id="tab-recordPayment" class="tab-btn px-4 py-2 rounded-lg font-medium text-sm hover:bg-blue-600 transition">💵 Record Payment</button>
         <button onclick="switchTab('customers')" id="tab-customers" class="tab-btn px-4 py-2 rounded-lg font-medium text-sm hover:bg-blue-600 transition">Customers</button>
         <button onclick="switchTab('debtors')" id="tab-debtors" class="tab-btn px-4 py-2 rounded-lg font-medium text-sm hover:bg-blue-600 transition">Debtors</button>
         <button onclick="switchTab('addCustomer')" id="tab-addCustomer" class="tab-btn px-4 py-2 rounded-lg font-medium text-sm hover:bg-blue-600 transition">+ Add Customer</button>
@@ -113,7 +114,51 @@
       </div>
     </section>
 
-    <!-- 3. CUSTOMERS SECTION -->
+    <!-- 3. RECORD MANUAL PAYMENT SECTION (NEW) -->
+    <section id="section-recordPayment" class="tab-content hidden">
+      <div class="max-w-xl mx-auto bg-white rounded-xl shadow-md p-6">
+        <h2 class="text-xl font-bold text-gray-800 mb-4 border-b pb-2">Record Payment</h2>
+        
+        <form id="paymentForm" onsubmit="recordManualPayment(event)">
+          <div class="mb-4">
+            <label class="block text-sm font-semibold text-gray-700 mb-1">Select Customer</label>
+            <select id="paymentCustomerSelect" class="w-full border rounded-lg p-2.5 bg-gray-50 focus:ring-2 focus:ring-blue-500" required>
+              <option value="">-- Select Customer --</option>
+            </select>
+          </div>
+
+          <div class="mb-4">
+            <label class="block text-sm font-semibold text-gray-700 mb-1">Invoice ID (Optional)</label>
+            <input type="text" id="paymentInvoiceId" placeholder="e.g. INV-100234 or leave blank for direct account" class="w-full border rounded-lg p-2.5">
+          </div>
+
+          <div class="mb-4">
+            <label class="block text-sm font-semibold text-gray-700 mb-1">Amount Paid (KES)</label>
+            <input type="number" id="paymentAmount" step="0.01" placeholder="e.g. 1500" class="w-full border rounded-lg p-2.5" required>
+          </div>
+
+          <div class="mb-4">
+            <label class="block text-sm font-semibold text-gray-700 mb-1">Payment Mode</label>
+            <select id="paymentMode" class="w-full border rounded-lg p-2.5 bg-gray-50">
+              <option value="M-Pesa">M-Pesa</option>
+              <option value="Cash">Cash</option>
+              <option value="Bank Transfer">Bank Transfer</option>
+            </select>
+          </div>
+
+          <div class="mb-6">
+            <label class="block text-sm font-semibold text-gray-700 mb-1">Transaction Ref / Receipt No.</label>
+            <input type="text" id="paymentReference" placeholder="e.g. QKH78923XY" class="w-full border rounded-lg p-2.5">
+          </div>
+
+          <button type="submit" id="submitPaymentBtn" class="w-full bg-green-600 text-white font-bold py-3 rounded-lg hover:bg-green-700 transition shadow">
+            Record Payment & Issue Receipt
+          </button>
+        </form>
+      </div>
+    </section>
+
+    <!-- 4. CUSTOMERS SECTION -->
     <section id="section-customers" class="tab-content hidden">
       <div class="bg-white rounded-xl shadow p-6">
         <h2 class="text-xl font-bold text-gray-800 mb-4">Customer Directory</h2>
@@ -136,7 +181,7 @@
       </div>
     </section>
 
-    <!-- 4. DEBTORS SECTION -->
+    <!-- 5. DEBTORS SECTION -->
     <section id="section-debtors" class="tab-content hidden">
       <div class="bg-white rounded-xl shadow p-6">
         <h2 class="text-xl font-bold text-gray-800 mb-4">Debtors & Unpaid Invoices</h2>
@@ -148,17 +193,18 @@
                 <th class="p-3">Phone</th>
                 <th class="p-3">Invoice ID</th>
                 <th class="p-3">Amount Due</th>
+                <th class="p-3 text-center">Action</th>
               </tr>
             </thead>
             <tbody id="debtorsTableBody" class="divide-y text-sm">
-              <tr><td colspan="4" class="p-4 text-center text-gray-500">Loading debtors list...</td></tr>
+              <tr><td colspan="5" class="p-4 text-center text-gray-500">Loading debtors list...</td></tr>
             </tbody>
           </table>
         </div>
       </div>
     </section>
 
-    <!-- 5. ADD CUSTOMER SECTION -->
+    <!-- 6. ADD CUSTOMER SECTION -->
     <section id="section-addCustomer" class="tab-content hidden">
       <div class="max-w-xl mx-auto bg-white rounded-xl shadow-md p-6">
         <h2 class="text-xl font-bold text-gray-800 mb-4 border-b pb-2">Add New Customer</h2>
@@ -224,28 +270,6 @@
       if (tabName === 'debtors') loadDebtors();
     }
 
-    // API Call Helper
-    async function sendApiRequest(payload) {
-      try {
-        const response = await fetch(SCRIPT_URL, {
-          method: "POST",
-          headers: { "Content-Type": "text/plain;charset=utf-8" },
-          body: JSON.stringify(payload)
-        });
-
-        const result = await response.json();
-
-        if (result.success) {
-          return result;
-        } else {
-          throw new Error(result.message || "Operation failed.");
-        }
-      } catch (err) {
-        console.error("API Request Error:", err);
-        throw err;
-      }
-    }
-
     // -------------------------------------------------------------
     // 1. DASHBOARD LOGIC
     // -------------------------------------------------------------
@@ -307,10 +331,8 @@
 
     function populateCustomerDropdown(customers) {
       const selectEl = document.getElementById("customerSelect");
-      if (!selectEl) return;
-
-      selectEl.innerHTML = '<option value="">-- Select Customer --</option>';
-
+      const paymentSelectEl = document.getElementById("paymentCustomerSelect");
+      
       const uniqueCustomers = new Map();
       customers.forEach(c => {
         const id = c.customerId || c.id;
@@ -319,14 +341,15 @@
         }
       });
 
+      const optionsHtml = ['<option value="">-- Select Customer --</option>'];
       uniqueCustomers.forEach(c => {
-        const option = document.createElement("option");
         const id = c.customerId || c.id;
-        option.value = id;
         const displayName = c.name && c.name !== "Customer" ? c.name : c.phone;
-        option.textContent = `${displayName} (${c.meterNumber || 'No Meter'})`;
-        selectEl.appendChild(option);
+        optionsHtml.push(`<option value="${id}">${displayName} (${c.meterNumber || 'No Meter'})</option>`);
       });
+
+      if (selectEl) selectEl.innerHTML = optionsHtml.join('');
+      if (paymentSelectEl) paymentSelectEl.innerHTML = optionsHtml.join('');
     }
 
     function renderCustomersTable(customers) {
@@ -484,7 +507,7 @@
         }
       } catch (err) {
         console.error('Error recording reading:', err);
-        alert('Server communication error. Ensure Apps Script Web App is deployed to "Anyone".');
+        alert('Server communication error.');
       } finally {
         if (submitBtn) {
           submitBtn.disabled = false;
@@ -494,7 +517,77 @@
     }
 
     // -------------------------------------------------------------
-    // 5. DEBTORS LOGIC
+    // 5. RECORD MANUAL PAYMENT (FRONTEND)
+    // -------------------------------------------------------------
+    async function recordManualPayment(event) {
+      if (event) event.preventDefault();
+
+      const customerId = document.getElementById('paymentCustomerSelect').value;
+      const invoiceId = document.getElementById('paymentInvoiceId').value.trim();
+      const amount = document.getElementById('paymentAmount').value.trim();
+      const paymentMode = document.getElementById('paymentMode').value;
+      const reference = document.getElementById('paymentReference').value.trim();
+      const submitBtn = document.getElementById('submitPaymentBtn');
+
+      if (!customerId || !amount) {
+        alert("Please select a customer and enter the amount paid.");
+        return;
+      }
+
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = "Processing Payment...";
+      }
+
+      const payload = {
+        action: 'recordPayment',
+        payload: {
+          customerId: customerId,
+          invoiceId: invoiceId,
+          amount: amount,
+          paymentMode: paymentMode,
+          reference: reference,
+          recordedBy: 'Admin'
+        }
+      };
+
+      try {
+        const response = await fetch(SCRIPT_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify(payload)
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+          alert(`✅ ${result.message}`);
+          
+          // Auto-trigger WhatsApp Receipt Prompt
+          const confirmWa = confirm("Would you like to send a payment confirmation receipt via WhatsApp?");
+          if (confirmWa) {
+            sendPaymentReceiptWhatsApp(customerId, amount, reference || result.paymentId);
+          }
+
+          document.getElementById('paymentForm').reset();
+          await loadCustomers();
+          switchTab('dashboard');
+        } else {
+          alert(`❌ Error: ${result.message}`);
+        }
+      } catch (err) {
+        console.error('Error recording payment:', err);
+        alert('Server communication error.');
+      } finally {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.textContent = "Record Payment & Issue Receipt";
+        }
+      }
+    }
+
+    // -------------------------------------------------------------
+    // 6. DEBTORS LOGIC WITH WHATSAPP REMINDERS
     // -------------------------------------------------------------
     async function loadDebtors() {
       try {
@@ -509,18 +602,30 @@
 
         if (result.success && Array.isArray(result.data)) {
           if (result.data.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-gray-500">No debtors found. All accounts clear!</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-gray-500">No debtors found. All accounts clear!</td></tr>';
             return;
           }
 
-          tbody.innerHTML = result.data.map(d => `
-            <tr class="hover:bg-red-50">
-              <td class="p-3 font-semibold">${d.customerName || d.customerId}</td>
-              <td class="p-3">${d.phone || 'N/A'}</td>
-              <td class="p-3 font-mono text-xs">${d.invoiceId}</td>
-              <td class="p-3 font-bold text-red-600">KES ${(Number(d.balance || d.totalAmount) || 0).toLocaleString()}</td>
-            </tr>
-          `).join('');
+          tbody.innerHTML = result.data.map(d => {
+            const amountDue = Number(d.balance || d.totalAmount) || 0;
+            const phone = d.phone || '';
+            const name = d.customerName || d.customerId || 'Customer';
+
+            return `
+              <tr class="hover:bg-red-50">
+                <td class="p-3 font-semibold">${name}</td>
+                <td class="p-3">${phone || 'N/A'}</td>
+                <td class="p-3 font-mono text-xs">${d.invoiceId}</td>
+                <td class="p-3 font-bold text-red-600">KES ${amountDue.toLocaleString()}</td>
+                <td class="p-3 text-center">
+                  <button onclick="sendDebtorReminderWhatsApp('${phone}', '${name}', '${d.invoiceId}', ${amountDue})" 
+                          class="bg-green-500 hover:bg-green-600 text-white font-bold px-3 py-1 rounded text-xs transition">
+                    📱 WhatsApp Reminder
+                  </button>
+                </td>
+              </tr>
+            `;
+          }).join('');
         }
       } catch (err) {
         console.error("Error loading debtors:", err);
@@ -528,7 +633,7 @@
     }
 
     // -------------------------------------------------------------
-    // 6. CREATE CUSTOMER LOGIC
+    // 7. CREATE CUSTOMER LOGIC
     // -------------------------------------------------------------
     async function createCustomer(event) {
       if (event) event.preventDefault();
@@ -582,107 +687,38 @@
           btn.textContent = "Save Customer";
         }
       }
-      // -------------------------------------------------------------
-// RECORD MANUAL PAYMENT (FRONTEND)
-// -------------------------------------------------------------
-async function recordManualPayment(event) {
-  if (event) event.preventDefault();
-
-  const customerId = document.getElementById('paymentCustomerSelect').value;
-  const invoiceId = document.getElementById('paymentInvoiceId').value.trim();
-  const amount = document.getElementById('paymentAmount').value.trim();
-  const paymentMode = document.getElementById('paymentMode').value;
-  const reference = document.getElementById('paymentReference').value.trim();
-  const submitBtn = document.getElementById('submitPaymentBtn');
-
-  if (!customerId || !amount) {
-    alert("Please select a customer and enter the amount paid.");
-    return;
-  }
-
-  if (submitBtn) {
-    submitBtn.disabled = true;
-    submitBtn.textContent = "Processing Payment...";
-  }
-
-  const payload = {
-    action: 'recordPayment',
-    payload: {
-      customerId: customerId,
-      invoiceId: invoiceId,
-      amount: amount,
-      paymentMode: paymentMode,
-      reference: reference,
-      recordedBy: 'Admin'
     }
-  };
 
-  try {
-    const response = await fetch(SCRIPT_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify(payload)
-    });
-
-    const result = await response.json();
-
-    if (result.success) {
-      alert(`✅ ${result.message}`);
-      
-      // Auto-trigger WhatsApp Receipt Prompt
-      const confirmWa = confirm("Would you like to send a payment confirmation receipt via WhatsApp?");
-      if (confirmWa) {
-        sendPaymentReceiptWhatsApp(customerId, amount, reference || result.paymentId);
+    // -------------------------------------------------------------
+    // 8. WHATSAPP DISPATCH HELPERS (0-COST)
+    // -------------------------------------------------------------
+    function sendPaymentReceiptWhatsApp(customerId, amount, ref) {
+      const customer = globalCustomersList.find(c => (c.id || c.customerId) === customerId);
+      if (!customer || !customer.phone) {
+        alert("Customer phone number not found.");
+        return;
       }
 
-      document.getElementById('paymentForm').reset();
-      await loadCustomers();
-      switchTab('dashboard');
-    } else {
-      alert(`❌ Error: ${result.message}`);
+      let phone = customer.phone.replace(/[^0-9]/g, '');
+      if (phone.startsWith('0')) phone = '254' + phone.slice(1);
+
+      const text = `Hello ${customer.name || ''},\n\nPayment Received! Thank you for paying KES ${Number(amount).toLocaleString()} to Joy Water Supplies.\nReference: ${ref}\n\nThank you for your business!`;
+      
+      window.open(`https://wa.me/${phone}?text=${encodeURIComponent(text)}`, '_blank');
     }
-  } catch (err) {
-    console.error('Error recording payment:', err);
-    alert('Server communication error.');
-  } finally {
-    if (submitBtn) {
-      submitBtn.disabled = false;
-      submitBtn.textContent = "Record Payment & Issue Receipt";
-    }
-  }
-}
 
-// -------------------------------------------------------------
-// WHATSAPP DISPATCH HELPERS (0-COST, NO API KEYS NEEDED)
-// -------------------------------------------------------------
-function sendPaymentReceiptWhatsApp(customerId, amount, ref) {
-  const customer = globalCustomersList.find(c => (c.id || c.customerId) === customerId);
-  if (!customer || !customer.phone) {
-    alert("Customer phone number not found.");
-    return;
-  }
+    function sendDebtorReminderWhatsApp(phone, customerName, invoiceId, amountDue) {
+      if (!phone) {
+        alert("Phone number missing.");
+        return;
+      }
 
-  let phone = customer.phone.replace(/[^0-9]/g, '');
-  if (phone.startsWith('0')) phone = '254' + phone.slice(1);
+      let formattedPhone = phone.replace(/[^0-9]/g, '');
+      if (formattedPhone.startsWith('0')) formattedPhone = '254' + formattedPhone.slice(1);
 
-  const text = `Hello ${customer.name || ''},\n\nPayment Received! Thank you for paying KES ${Number(amount).toLocaleString()} to Joy Water Supplies.\nReference: ${ref}\n\nThank you for your business!`;
-  
-  window.open(`https://wa.me/${phone}?text=${encodeURIComponent(text)}`, '_blank');
-}
+      const text = `Hello ${customerName || 'Valued Customer'},\n\nThis is a friendly reminder from Joy Water Supplies regarding pending invoice ${invoiceId} for KES ${Number(amountDue).toLocaleString()}.\n\nKindly make payment via M-Pesa to clear your balance. Thank you!`;
 
-function sendDebtorReminderWhatsApp(phone, customerName, invoiceId, amountDue) {
-  if (!phone) {
-    alert("Phone number missing.");
-    return;
-  }
-
-  let formattedPhone = phone.replace(/[^0-9]/g, '');
-  if (formattedPhone.startsWith('0')) formattedPhone = '254' + formattedPhone.slice(1);
-
-  const text = `Hello ${customerName || 'Valued Customer'},\n\nThis is a friendly reminder from Joy Water Supplies regarding pending invoice ${invoiceId} for KES ${Number(amountDue).toLocaleString()}.\n\nKindly make payment via M-Pesa to clear your balance. Thank you!`;
-
-  window.open(`https://wa.me/${formattedPhone}?text=${encodeURIComponent(text)}`, '_blank');
-}
+      window.open(`https://wa.me/${formattedPhone}?text=${encodeURIComponent(text)}`, '_blank');
     }
   </script>
 </body>
