@@ -589,48 +589,93 @@
     // -------------------------------------------------------------
     // 6. DEBTORS LOGIC WITH WHATSAPP REMINDERS
     // -------------------------------------------------------------
-    async function loadDebtors() {
-      try {
-        const response = await fetch(SCRIPT_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify({ action: 'getDebtors' })
-        });
+  // -------------------------------------------------------------
+// AGED DEBTORS LOGIC WITH FIRM & COURTEOUS REMINDERS
+// -------------------------------------------------------------
+async function loadDebtors() {
+  const tbody = document.getElementById('debtorsTableBody');
+  if (tbody) tbody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-gray-500">Loading aged debtors...</td></tr>';
 
-        const result = await response.json();
-        const tbody = document.getElementById('debtorsTableBody');
+  try {
+    const response = await fetch(SCRIPT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ action: 'getDebtors' })
+    });
 
-        if (result.success && Array.isArray(result.data)) {
-          if (result.data.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-gray-500">No debtors found. All accounts clear!</td></tr>';
-            return;
-          }
+    const result = await response.json();
 
-          tbody.innerHTML = result.data.map(d => {
-            const amountDue = Number(d.balance || d.totalAmount) || 0;
-            const phone = d.phone || '';
-            const name = d.customerName || d.customerId || 'Customer';
-
-            return `
-              <tr class="hover:bg-red-50">
-                <td class="p-3 font-semibold">${name}</td>
-                <td class="p-3">${phone || 'N/A'}</td>
-                <td class="p-3 font-mono text-xs">${d.invoiceId}</td>
-                <td class="p-3 font-bold text-red-600">KES ${amountDue.toLocaleString()}</td>
-                <td class="p-3 text-center">
-                  <button onclick="sendDebtorReminderWhatsApp('${phone}', '${name}', '${d.invoiceId}', ${amountDue})" 
-                          class="bg-green-500 hover:bg-green-600 text-white font-bold px-3 py-1 rounded text-xs transition">
-                    📱 WhatsApp Reminder
-                  </button>
-                </td>
-              </tr>
-            `;
-          }).join('');
-        }
-      } catch (err) {
-        console.error("Error loading debtors:", err);
+    if (result.success && Array.isArray(result.data)) {
+      if (result.data.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-gray-500">🎉 No outstanding debts found!</td></tr>';
+        return;
       }
+
+      tbody.innerHTML = result.data.map(d => {
+        let ageBadgeColor = "bg-yellow-100 text-yellow-800";
+        if (d.ageDays > 90) ageBadgeColor = "bg-red-200 text-red-900 font-bold";
+        else if (d.ageDays > 60) ageBadgeColor = "bg-red-100 text-red-800";
+        else if (d.ageDays > 30) ageBadgeColor = "bg-orange-100 text-orange-800";
+
+        return `
+          <tr class="hover:bg-red-50 border-b">
+            <td class="p-3 font-semibold">${d.customerName}</td>
+            <td class="p-3">${d.phone || 'N/A'}</td>
+            <td class="p-3 font-mono text-xs">${d.invoiceNo}</td>
+            <td class="p-3"><span class="px-2 py-1 rounded text-xs ${ageBadgeColor}">${d.agingCategory} (${d.ageDays}d)</span></td>
+            <td class="p-3 font-bold text-red-600">KES ${Number(d.amountDue).toLocaleString()}</td>
+            <td class="p-3 text-center">
+              <button onclick="sendCourteousReminder('${d.phone}', '${d.customerName}', '${d.invoiceNo}', ${d.amountDue}, ${d.ageDays})" 
+                      class="bg-green-600 hover:bg-green-700 text-white font-bold px-3 py-1.5 rounded text-xs transition shadow flex items-center gap-1 mx-auto">
+                📱 Send Reminder
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
     }
+  } catch (err) {
+    console.error("Error loading debtors:", err);
+    if (tbody) tbody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-red-500">Failed to load debtors list.</td></tr>';
+  }
+}
+
+// Firm, professional, and courteous reminder generator
+function sendCourteousReminder(phone, customerName, invoiceNo, amountDue, ageDays) {
+  if (!phone) {
+    alert("Phone number missing for this customer.");
+    return;
+  }
+
+  let formattedPhone = phone.replace(/[^0-9]/g, '');
+  if (formattedPhone.startsWith('0')) formattedPhone = '254' + formattedPhone.slice(1);
+
+  let toneMessage = "";
+  if (ageDays > 60) {
+    toneMessage = `We notice invoice *${invoiceNo}* is currently past due (${ageDays} days). Kindly prioritize clearing this balance to ensure uninterrupted water supply services.`;
+  } else {
+    toneMessage = `This is a friendly reminder regarding pending invoice *${invoiceNo}* for KES ${Number(amountDue).toLocaleString()}. Kindly make payment at your earliest convenience.`;
+  }
+
+  const text = 
+`Dear ${customerName || 'Valued Customer'},
+
+Hope this message finds you well. 💧
+
+${toneMessage}
+
+💳 *Payment Options:*
+- Buy Goods Till Number: *5663845* (Joy Water Supplies)
+- Reference: Your Meter No. / ${invoiceNo}
+
+If you have already made this payment, please disregard this note or share the M-Pesa receipt for quick reconciliation.
+
+Thank you for your partnership!
+*Joy Water Supplies*
+☎ 0713 170 222`;
+
+  window.open(`https://wa.me/${formattedPhone}?text=${encodeURIComponent(text)}`, '_blank');
+}
 
     // -------------------------------------------------------------
     // 7. CREATE CUSTOMER LOGIC
