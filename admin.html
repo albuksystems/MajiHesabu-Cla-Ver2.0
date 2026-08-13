@@ -114,7 +114,7 @@
       </div>
     </section>
 
-    <!-- 3. RECORD MANUAL PAYMENT SECTION (NEW) -->
+    <!-- 3. RECORD MANUAL PAYMENT SECTION -->
     <section id="section-recordPayment" class="tab-content hidden">
       <div class="max-w-xl mx-auto bg-white rounded-xl shadow-md p-6">
         <h2 class="text-xl font-bold text-gray-800 mb-4 border-b pb-2">Record Payment</h2>
@@ -181,23 +181,24 @@
       </div>
     </section>
 
-    <!-- 5. DEBTORS SECTION -->
+    <!-- 5. DEBTORS SECTION (UPDATED FOR AGED DEBTORS) -->
     <section id="section-debtors" class="tab-content hidden">
       <div class="bg-white rounded-xl shadow p-6">
-        <h2 class="text-xl font-bold text-gray-800 mb-4">Debtors & Unpaid Invoices</h2>
+        <h2 class="text-xl font-bold text-gray-800 mb-4">Aged Debtors & Outstanding Accounts</h2>
         <div class="overflow-x-auto">
           <table class="w-full text-left border-collapse">
             <thead>
               <tr class="bg-red-50 border-b text-xs font-semibold text-red-700 uppercase">
                 <th class="p-3">Customer</th>
                 <th class="p-3">Phone</th>
-                <th class="p-3">Invoice ID</th>
+                <th class="p-3">Invoice No</th>
+                <th class="p-3">Aging Status</th>
                 <th class="p-3">Amount Due</th>
                 <th class="p-3 text-center">Action</th>
               </tr>
             </thead>
             <tbody id="debtorsTableBody" class="divide-y text-sm">
-              <tr><td colspan="5" class="p-4 text-center text-gray-500">Loading debtors list...</td></tr>
+              <tr><td colspan="6" class="p-4 text-center text-gray-500">Loading debtors list...</td></tr>
             </tbody>
           </table>
         </div>
@@ -517,7 +518,7 @@
     }
 
     // -------------------------------------------------------------
-    // 5. RECORD MANUAL PAYMENT (FRONTEND)
+    // 5. RECORD MANUAL PAYMENT
     // -------------------------------------------------------------
     async function recordManualPayment(event) {
       if (event) event.preventDefault();
@@ -563,12 +564,6 @@
         if (result.success) {
           alert(`✅ ${result.message}`);
           
-          // Auto-trigger WhatsApp Receipt Prompt
-          const confirmWa = confirm("Would you like to send a payment confirmation receipt via WhatsApp?");
-          if (confirmWa) {
-            sendPaymentReceiptWhatsApp(customerId, amount, reference || result.paymentId);
-          }
-
           document.getElementById('paymentForm').reset();
           await loadCustomers();
           switchTab('dashboard');
@@ -587,77 +582,74 @@
     }
 
     // -------------------------------------------------------------
-    // 6. DEBTORS LOGIC WITH WHATSAPP REMINDERS
+    // 6. AGED DEBTORS LOGIC WITH FIRM & COURTEOUS REMINDERS
     // -------------------------------------------------------------
-  // -------------------------------------------------------------
-// AGED DEBTORS LOGIC WITH FIRM & COURTEOUS REMINDERS
-// -------------------------------------------------------------
-async function loadDebtors() {
-  const tbody = document.getElementById('debtorsTableBody');
-  if (tbody) tbody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-gray-500">Loading aged debtors...</td></tr>';
+    async function loadDebtors() {
+      const tbody = document.getElementById('debtorsTableBody');
+      if (tbody) tbody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-gray-500">Loading aged debtors...</td></tr>';
 
-  try {
-    const response = await fetch(SCRIPT_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify({ action: 'getDebtors' })
-    });
+      try {
+        const response = await fetch(SCRIPT_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({ action: 'getDebtors' })
+        });
 
-    const result = await response.json();
+        const result = await response.json();
 
-    if (result.success && Array.isArray(result.data)) {
-      if (result.data.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-gray-500">🎉 No outstanding debts found!</td></tr>';
+        if (result.success && Array.isArray(result.data)) {
+          if (result.data.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-gray-500">🎉 No outstanding debts found!</td></tr>';
+            return;
+          }
+
+          tbody.innerHTML = result.data.map(d => {
+            let ageBadgeColor = "bg-yellow-100 text-yellow-800";
+            if (d.ageDays > 90) ageBadgeColor = "bg-red-200 text-red-900 font-bold";
+            else if (d.ageDays > 60) ageBadgeColor = "bg-red-100 text-red-800";
+            else if (d.ageDays > 30) ageBadgeColor = "bg-orange-100 text-orange-800";
+
+            return `
+              <tr class="hover:bg-red-50 border-b">
+                <td class="p-3 font-semibold">${d.customerName}</td>
+                <td class="p-3">${d.phone || 'N/A'}</td>
+                <td class="p-3 font-mono text-xs">${d.invoiceNo}</td>
+                <td class="p-3"><span class="px-2 py-1 rounded text-xs ${ageBadgeColor}">${d.agingCategory} (${d.ageDays}d)</span></td>
+                <td class="p-3 font-bold text-red-600">KES ${Number(d.amountDue).toLocaleString()}</td>
+                <td class="p-3 text-center">
+                  <button onclick="sendCourteousReminder('${d.phone}', '${d.customerName}', '${d.invoiceNo}', ${d.amountDue}, ${d.ageDays})" 
+                          class="bg-green-600 hover:bg-green-700 text-white font-bold px-3 py-1.5 rounded text-xs transition shadow flex items-center gap-1 mx-auto">
+                    📱 Send Reminder
+                  </button>
+                </td>
+              </tr>
+            `;
+          }).join('');
+        }
+      } catch (err) {
+        console.error("Error loading debtors:", err);
+        if (tbody) tbody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-red-500">Failed to load debtors list.</td></tr>';
+      }
+    }
+
+    // Firm, professional, and courteous reminder generator
+    function sendCourteousReminder(phone, customerName, invoiceNo, amountDue, ageDays) {
+      if (!phone) {
+        alert("Phone number missing for this customer.");
         return;
       }
 
-      tbody.innerHTML = result.data.map(d => {
-        let ageBadgeColor = "bg-yellow-100 text-yellow-800";
-        if (d.ageDays > 90) ageBadgeColor = "bg-red-200 text-red-900 font-bold";
-        else if (d.ageDays > 60) ageBadgeColor = "bg-red-100 text-red-800";
-        else if (d.ageDays > 30) ageBadgeColor = "bg-orange-100 text-orange-800";
+      let formattedPhone = phone.replace(/[^0-9]/g, '');
+      if (formattedPhone.startsWith('0')) formattedPhone = '254' + formattedPhone.slice(1);
 
-        return `
-          <tr class="hover:bg-red-50 border-b">
-            <td class="p-3 font-semibold">${d.customerName}</td>
-            <td class="p-3">${d.phone || 'N/A'}</td>
-            <td class="p-3 font-mono text-xs">${d.invoiceNo}</td>
-            <td class="p-3"><span class="px-2 py-1 rounded text-xs ${ageBadgeColor}">${d.agingCategory} (${d.ageDays}d)</span></td>
-            <td class="p-3 font-bold text-red-600">KES ${Number(d.amountDue).toLocaleString()}</td>
-            <td class="p-3 text-center">
-              <button onclick="sendCourteousReminder('${d.phone}', '${d.customerName}', '${d.invoiceNo}', ${d.amountDue}, ${d.ageDays})" 
-                      class="bg-green-600 hover:bg-green-700 text-white font-bold px-3 py-1.5 rounded text-xs transition shadow flex items-center gap-1 mx-auto">
-                📱 Send Reminder
-              </button>
-            </td>
-          </tr>
-        `;
-      }).join('');
-    }
-  } catch (err) {
-    console.error("Error loading debtors:", err);
-    if (tbody) tbody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-red-500">Failed to load debtors list.</td></tr>';
-  }
-}
+      let toneMessage = "";
+      if (ageDays > 60) {
+        toneMessage = `We notice invoice *${invoiceNo}* is currently past due (${ageDays} days). Kindly prioritize clearing this balance to ensure uninterrupted water supply services.`;
+      } else {
+        toneMessage = `This is a friendly reminder regarding pending invoice *${invoiceNo}* for KES ${Number(amountDue).toLocaleString()}. Kindly make payment at your earliest convenience.`;
+      }
 
-// Firm, professional, and courteous reminder generator
-function sendCourteousReminder(phone, customerName, invoiceNo, amountDue, ageDays) {
-  if (!phone) {
-    alert("Phone number missing for this customer.");
-    return;
-  }
-
-  let formattedPhone = phone.replace(/[^0-9]/g, '');
-  if (formattedPhone.startsWith('0')) formattedPhone = '254' + formattedPhone.slice(1);
-
-  let toneMessage = "";
-  if (ageDays > 60) {
-    toneMessage = `We notice invoice *${invoiceNo}* is currently past due (${ageDays} days). Kindly prioritize clearing this balance to ensure uninterrupted water supply services.`;
-  } else {
-    toneMessage = `This is a friendly reminder regarding pending invoice *${invoiceNo}* for KES ${Number(amountDue).toLocaleString()}. Kindly make payment at your earliest convenience.`;
-  }
-
-  const text = 
+      const text = 
 `Dear ${customerName || 'Valued Customer'},
 
 Hope this message finds you well. 💧
@@ -674,8 +666,8 @@ Thank you for your partnership!
 *Joy Water Supplies*
 ☎ 0713 170 222`;
 
-  window.open(`https://wa.me/${formattedPhone}?text=${encodeURIComponent(text)}`, '_blank');
-}
+      window.open(`https://wa.me/${formattedPhone}?text=${encodeURIComponent(text)}`, '_blank');
+    }
 
     // -------------------------------------------------------------
     // 7. CREATE CUSTOMER LOGIC
@@ -732,38 +724,6 @@ Thank you for your partnership!
           btn.textContent = "Save Customer";
         }
       }
-    }
-
-    // -------------------------------------------------------------
-    // 8. WHATSAPP DISPATCH HELPERS (0-COST)
-    // -------------------------------------------------------------
-    function sendPaymentReceiptWhatsApp(customerId, amount, ref) {
-      const customer = globalCustomersList.find(c => (c.id || c.customerId) === customerId);
-      if (!customer || !customer.phone) {
-        alert("Customer phone number not found.");
-        return;
-      }
-
-      let phone = customer.phone.replace(/[^0-9]/g, '');
-      if (phone.startsWith('0')) phone = '254' + phone.slice(1);
-
-      const text = `Hello ${customer.name || ''},\n\nPayment Received! Thank you for paying KES ${Number(amount).toLocaleString()} to Joy Water Supplies.\nReference: ${ref}\n\nThank you for your business!`;
-      
-      window.open(`https://wa.me/${phone}?text=${encodeURIComponent(text)}`, '_blank');
-    }
-
-    function sendDebtorReminderWhatsApp(phone, customerName, invoiceId, amountDue) {
-      if (!phone) {
-        alert("Phone number missing.");
-        return;
-      }
-
-      let formattedPhone = phone.replace(/[^0-9]/g, '');
-      if (formattedPhone.startsWith('0')) formattedPhone = '254' + formattedPhone.slice(1);
-
-      const text = `Hello ${customerName || 'Valued Customer'},\n\nThis is a friendly reminder from Joy Water Supplies regarding pending invoice ${invoiceId} for KES ${Number(amountDue).toLocaleString()}.\n\nKindly make payment via M-Pesa to clear your balance. Thank you!`;
-
-      window.open(`https://wa.me/${formattedPhone}?text=${encodeURIComponent(text)}`, '_blank');
     }
   </script>
 </body>
