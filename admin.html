@@ -226,7 +226,28 @@
       if (tabName === 'dashboard') loadDashboard();
       if (tabName === 'debtors') loadDebtors();
     }
+API CALL HELPER (Prevents GET fallback errors)
+async function sendApiRequest(payload) {
+  try {
+    const response = await fetch(SCRIPT_URL, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" }, // Prevents CORS pre-flight redirect
+      body: JSON.stringify(payload)
+    });
 
+    const result = await response.json();
+
+    // Check explicitly for success property
+    if (result.success) {
+      return result;
+    } else {
+      throw new Error(result.message || "Operation failed.");
+    }
+  } catch (err) {
+    console.error("API Request Error:", err);
+    throw err;
+  }
+}
     // -------------------------------------------------------------
     // 1. DASHBOARD LOGIC
     // -------------------------------------------------------------
@@ -419,7 +440,7 @@ function calculateBillEstimate(consumption, waterRate = 100) {
   document.getElementById("consumptionDisplay").innerText = consumption.toFixed(2) + " m³";
   document.getElementById("estimatedBillDisplay").innerText = "KSh " + estimatedBill.toLocaleString("en-KE", {minimumFractionDigits: 2});
 }
-
+}
     // -------------------------------------------------------------
     // 4. RECORD READING SUBMISSION
     // -------------------------------------------------------------
