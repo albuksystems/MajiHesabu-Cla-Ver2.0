@@ -411,6 +411,14 @@
         costDisplay.textContent = `KSh ${estimatedCost.toLocaleString('en-KE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
       }
     }
+    CALCULATION & BILL ESTIMATE (Set rate dynamically)
+function calculateBillEstimate(consumption, waterRate = 100) {
+  const estimatedBill = consumption * waterRate;
+  
+  // Example DOM updates:
+  document.getElementById("consumptionDisplay").innerText = consumption.toFixed(2) + " m³";
+  document.getElementById("estimatedBillDisplay").innerText = "KSh " + estimatedBill.toLocaleString("en-KE", {minimumFractionDigits: 2});
+}
 
     // -------------------------------------------------------------
     // 4. RECORD READING SUBMISSION
