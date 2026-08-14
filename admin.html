@@ -68,6 +68,7 @@
         <h2 class="text-xl font-bold text-gray-800 mb-4 border-b pb-2">Record Meter Reading</h2>
         
         <form id="meterReadingForm" onsubmit="recordReading(event)">
+          <!-- Select Customer -->
           <div class="mb-4">
             <label class="block text-sm font-semibold text-gray-700 mb-1">Customer / Meter</label>
             <select id="customerSelect" onchange="onCustomerSelectChange()" class="w-full border rounded-lg p-2.5 bg-gray-50 focus:ring-2 focus:ring-blue-500" required>
@@ -75,16 +76,19 @@
             </select>
           </div>
 
+          <!-- Previous Reading (Read-only) -->
           <div class="mb-4">
             <label class="block text-sm font-semibold text-gray-700 mb-1">Previous Reading (m³)</label>
             <input type="number" id="prevReadingInput" readonly disabled value="0" class="w-full border rounded-lg p-2.5 bg-gray-100 font-semibold text-gray-600">
           </div>
 
+          <!-- Current Reading Input -->
           <div class="mb-2">
             <label class="block text-sm font-semibold text-gray-700 mb-1">Current Reading (m³)</label>
             <input type="number" id="currentReadingInput" step="0.01" oninput="calculateConsumption()" placeholder="Enter current reading" class="w-full border rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500" required>
           </div>
 
+          <!-- Rollover Checkbox -->
           <div class="mb-4 flex items-center mt-2">
             <input type="checkbox" id="isRolloverCheckbox" onchange="calculateConsumption()" class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500">
             <label for="isRolloverCheckbox" class="ml-2 text-sm font-medium text-gray-700 select-none">
@@ -92,6 +96,7 @@
             </label>
           </div>
 
+          <!-- Live Preview Box -->
           <div class="p-4 bg-blue-50 border border-blue-200 rounded-lg mb-6">
             <div class="text-sm text-gray-700">
               Calculated Consumption: <span id="consumptionPreview" class="text-gray-500 font-bold">0 m³</span>
@@ -101,6 +106,7 @@
             </div>
           </div>
 
+          <!-- Submit Button -->
           <button type="submit" id="submitReadingBtn" class="w-full bg-blue-600 text-white font-bold py-3 rounded-lg hover:bg-blue-700 transition shadow">
             Record Reading & Generate Invoice
           </button>
@@ -175,7 +181,7 @@
       </div>
     </section>
 
-    <!-- 5. DEBTORS SECTION -->
+    <!-- 5. DEBTORS SECTION (UPDATED FOR AGED DEBTORS) -->
     <section id="section-debtors" class="tab-content hidden">
       <div class="bg-white rounded-xl shadow p-6">
         <h2 class="text-xl font-bold text-gray-800 mb-4">Aged Debtors & Outstanding Accounts</h2>
@@ -236,10 +242,16 @@
   </main>
 
   <script>
+    // -------------------------------------------------------------
+    // CONFIGURATION & GLOBAL STATE
+    // -------------------------------------------------------------
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwpK9chdjn0UvkLLQq8u7H1DpLGep7SMSPYtxp41_hjvOIlydqRjfQYzPh6OXNzUSnd/exec";
 
     let globalCustomersList = [];
 
+    // -------------------------------------------------------------
+    // INITIALIZATION & TAB NAVIGATION
+    // -------------------------------------------------------------
     document.addEventListener("DOMContentLoaded", () => {
       loadDashboard();
       loadCustomers();
@@ -260,7 +272,7 @@
     }
 
     // -------------------------------------------------------------
-    // DASHBOARD LOGIC
+    // 1. DASHBOARD LOGIC
     // -------------------------------------------------------------
     async function loadDashboard() {
       try {
@@ -271,8 +283,11 @@
         });
 
         const result = await response.json();
+
         if (result.success || result.totalRevenue !== undefined) {
           renderDashboardUI(result);
+        } else {
+          console.error("Dashboard error:", result.error || result);
         }
       } catch (err) {
         console.error("Error loading dashboard:", err);
@@ -291,7 +306,7 @@
     }
 
     // -------------------------------------------------------------
-    // CUSTOMERS & DIRECT METER NAVIGATION
+    // 2. CUSTOMERS FETCH & DROPDOWN LOGIC
     // -------------------------------------------------------------
     async function loadCustomers() {
       try {
@@ -307,6 +322,8 @@
           globalCustomersList = result.data || result;
           populateCustomerDropdown(globalCustomersList);
           renderCustomersTable(globalCustomersList);
+        } else {
+          console.error('Failed to load customers:', result.message || result);
         }
       } catch (err) {
         console.error('Error loading customers:', err);
@@ -345,32 +362,15 @@
         return;
       }
 
-      tbody.innerHTML = customers.map(c => {
-        const customerId = c.customerId || c.id || '';
-        return `
-          <tr class="hover:bg-gray-50">
-            <td class="p-3 font-mono text-xs">${customerId || '-'}</td>
-            <td class="p-3 font-semibold">${c.name || 'N/A'}</td>
-            <td class="p-3">${c.phone || 'N/A'}</td>
-            <td class="p-3">${c.location || 'N/A'}</td>
-            <td class="p-3 font-mono text-xs">
-              <a href="javascript:void(0)" onclick="navigateToReadingForCustomer('${customerId}')" class="text-blue-600 hover:underline font-bold bg-blue-50 px-2 py-1 rounded border border-blue-200 inline-block">
-                📟 ${c.meterNumber || 'No Meter'} ➔
-              </a>
-            </td>
-          </tr>
-        `;
-      }).join('');
-    }
-
-    // Direct navigation helper
-    function navigateToReadingForCustomer(customerId) {
-      switchTab('recordReading');
-      const selectEl = document.getElementById('customerSelect');
-      if (selectEl) {
-        selectEl.value = customerId;
-        onCustomerSelectChange();
-      }
+      tbody.innerHTML = customers.map(c => `
+        <tr class="hover:bg-gray-50">
+          <td class="p-3 font-mono text-xs">${c.customerId || c.id || '-'}</td>
+          <td class="p-3 font-semibold">${c.name || 'N/A'}</td>
+          <td class="p-3">${c.phone || 'N/A'}</td>
+          <td class="p-3">${c.location || 'N/A'}</td>
+          <td class="p-3 font-mono text-xs text-blue-600">${c.meterNumber || 'N/A'}</td>
+        </tr>
+      `).join('');
     }
 
     function onCustomerSelectChange() {
@@ -388,6 +388,9 @@
       calculateConsumption();
     }
 
+    // -------------------------------------------------------------
+    // 3. LIVE CONSUMPTION & ROLLOVER CALCULATION
+    // -------------------------------------------------------------
     function calculateConsumption() {
       const prevInput = document.getElementById('prevReadingInput');
       const currInput = document.getElementById('currentReadingInput');
@@ -404,29 +407,45 @@
 
       if (currentVal === "") {
         consumptionDisplay.textContent = "0 m³";
+        consumptionDisplay.className = "text-gray-500 font-bold";
         if (costDisplay) costDisplay.textContent = "KSh 0.00";
         if (submitBtn) submitBtn.disabled = false;
         return;
       }
 
       const current = parseFloat(currentVal);
+
       if (isNaN(current)) {
         consumptionDisplay.textContent = "Invalid entry";
+        consumptionDisplay.className = "text-red-500 font-bold";
+        if (costDisplay) costDisplay.textContent = "KSh 0.00";
         if (submitBtn) submitBtn.disabled = true;
         return;
       }
 
-      let consumption = isRollover ? current : current - previous;
-      const RATE_PER_UNIT = 100;
+      let consumption = 0;
+      const RATE_PER_UNIT = 100; // Standard water rate per m³
 
-      if (consumption < 0) {
-        consumptionDisplay.textContent = `${consumption.toFixed(2)} m³ (Error: Reading lower than previous)`;
-        if (submitBtn) submitBtn.disabled = true;
-        return;
+      if (isRollover) {
+        consumption = current;
+        consumptionDisplay.textContent = `${consumption.toFixed(2)} m³ (Meter Reset / Rollover Active)`;
+        consumptionDisplay.className = "text-amber-600 font-bold";
+        if (submitBtn) submitBtn.disabled = false;
+      } else {
+        consumption = current - previous;
+
+        if (consumption < 0) {
+          consumptionDisplay.textContent = `${consumption.toFixed(2)} m³ (Error: Reading lower than previous)`;
+          consumptionDisplay.className = "text-red-600 font-bold";
+          if (costDisplay) costDisplay.textContent = "KSh 0.00";
+          if (submitBtn) submitBtn.disabled = true;
+          return;
+        } else {
+          consumptionDisplay.textContent = `${consumption.toFixed(2)} m³`;
+          consumptionDisplay.className = "text-green-600 font-bold";
+          if (submitBtn) submitBtn.disabled = false;
+        }
       }
-
-      consumptionDisplay.textContent = `${consumption.toFixed(2)} m³`;
-      if (submitBtn) submitBtn.disabled = false;
 
       if (costDisplay) {
         const estimatedCost = consumption * RATE_PER_UNIT;
@@ -434,55 +453,72 @@
       }
     }
 
+    // -------------------------------------------------------------
+    // 4. RECORD READING SUBMISSION
+    // -------------------------------------------------------------
     async function recordReading(event) {
       if (event) event.preventDefault();
 
-      const customerId = document.getElementById('customerSelect').value;
-      const reading = document.getElementById('currentReadingInput').value.trim();
-      const isRollover = document.getElementById('isRolloverCheckbox').checked;
+      const customerSelect = document.getElementById('customerSelect');
+      const readingInput = document.getElementById('currentReadingInput');
+      const rolloverCheck = document.getElementById('isRolloverCheckbox');
       const submitBtn = document.getElementById('submitReadingBtn');
+
+      const customerId = customerSelect ? customerSelect.value : '';
+      const reading = readingInput ? readingInput.value.trim() : '';
+      const isRollover = rolloverCheck ? rolloverCheck.checked : false;
 
       if (!customerId || reading === '') {
         alert("Please select a customer and enter a meter reading.");
         return;
       }
 
-      submitBtn.disabled = true;
-      submitBtn.textContent = "Recording...";
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = "Recording...";
+      }
+
+      const payload = {
+        action: 'recordMeterReading',
+        customerId: customerId,
+        reading: reading,
+        isRollover: isRollover,
+        recordedBy: 'Admin'
+      };
 
       try {
         const response = await fetch(SCRIPT_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify({
-            action: 'recordMeterReading',
-            customerId: customerId,
-            reading: reading,
-            isRollover: isRollover,
-            recordedBy: 'Admin'
-          })
+          body: JSON.stringify(payload)
         });
 
         const result = await response.json();
+
         if (result.success) {
-          alert(`✅ ${result.message || 'Reading recorded!'}\nInvoice ID: ${result.invoiceId || 'N/A'}`);
-          document.getElementById('currentReadingInput').value = '';
-          document.getElementById('isRolloverCheckbox').checked = false;
+          alert(`✅ ${result.message || 'Reading recorded successfully!'}\nInvoice ID: ${result.invoiceId || 'N/A'}`);
+          
+          readingInput.value = '';
+          if (rolloverCheck) rolloverCheck.checked = false;
+          
           await loadCustomers();
           switchTab('dashboard');
         } else {
-          alert(`❌ Error: ${result.message}`);
+          alert(`❌ Error: ${result.message || 'Failed to record reading'}`);
         }
       } catch (err) {
+        console.error('Error recording reading:', err);
         alert('Server communication error.');
       } finally {
-        submitBtn.disabled = false;
-        submitBtn.textContent = "Record Reading & Generate Invoice";
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.textContent = "Record Reading & Generate Invoice";
+        }
       }
     }
 
     // -------------------------------------------------------------
-    // RECORD PAYMENT & INSTANT RECEIPT GENERATION
+    // 5. RECORD MANUAL PAYMENT
     // -------------------------------------------------------------
     async function recordManualPayment(event) {
       if (event) event.preventDefault();
@@ -499,86 +535,54 @@
         return;
       }
 
-      submitBtn.disabled = true;
-      submitBtn.textContent = "Processing Payment...";
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = "Processing Payment...";
+      }
+
+      const payload = {
+        action: 'recordPayment',
+        payload: {
+          customerId: customerId,
+          invoiceId: invoiceId,
+          amount: amount,
+          paymentMode: paymentMode,
+          reference: reference,
+          recordedBy: 'Admin'
+        }
+      };
 
       try {
         const response = await fetch(SCRIPT_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify({
-            action: 'recordPayment',
-            payload: {
-              customerId: customerId,
-              invoiceId: invoiceId,
-              amount: amount,
-              paymentMode: paymentMode,
-              reference: reference,
-              recordedBy: 'Admin'
-            }
-          })
+          body: JSON.stringify(payload)
         });
 
         const result = await response.json();
 
         if (result.success) {
-          alert(`✅ Payment posted successfully!`);
-
-          // Ask to dispatch receipt
-          const sendReceipt = confirm("Would you like to send an instant payment receipt via WhatsApp?");
-          if (sendReceipt) {
-            sendWhatsAppReceipt(result);
-          }
-
+          alert(`✅ ${result.message}`);
+          
           document.getElementById('paymentForm').reset();
-          await loadDashboard();
+          await loadCustomers();
           switchTab('dashboard');
         } else {
           alert(`❌ Error: ${result.message}`);
         }
       } catch (err) {
+        console.error('Error recording payment:', err);
         alert('Server communication error.');
       } finally {
-        submitBtn.disabled = false;
-        submitBtn.textContent = "Record Payment & Issue Receipt";
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.textContent = "Record Payment & Issue Receipt";
+        }
       }
     }
 
-    // Send WhatsApp Receipt
-    function sendWhatsAppReceipt(paymentData) {
-      const name = paymentData.customerName || "Valued Customer";
-      const phone = paymentData.phone || "";
-      const amount = Number(paymentData.amountPaid || 0).toLocaleString();
-      const balance = Number(paymentData.remainingBalance || 0);
-      const ref = paymentData.reference || "M-Pesa";
-      const date = paymentData.date || new Date().toLocaleDateString('en-GB');
-
-      let statusMsg = balance <= 0 
-        ? "Your account is now fully settled ✅" 
-        : `Remaining Account Balance: *KES ${balance.toLocaleString()}*`;
-
-      let formattedPhone = phone.replace(/[^0-9]/g, '');
-      if (formattedPhone.startsWith('0')) formattedPhone = '254' + formattedPhone.slice(1);
-
-      const text = 
-`Dear ${name},
-
-✅ *Payment Received – Joy Water Supplies*
-
-💚 *KES ${amount}* via ${ref}
-📅 Date: ${date}
-
-${statusMsg}
-
-Thank you for your payment! 🙏
-*Joy Water Supplies*
-☎ 0713 170 222`;
-
-      window.open(`https://wa.me/${formattedPhone}?text=${encodeURIComponent(text)}`, '_blank');
-    }
-
     // -------------------------------------------------------------
-    // AGED DEBTORS REPORT & REMINDERS
+    // 6. AGED DEBTORS LOGIC WITH FIRM & COURTEOUS REMINDERS
     // -------------------------------------------------------------
     async function loadDebtors() {
       const tbody = document.getElementById('debtorsTableBody');
@@ -600,27 +604,20 @@ Thank you for your payment! 🙏
           }
 
           tbody.innerHTML = result.data.map(d => {
-            const customerName = d.customerName || 'Customer';
-            const phone = d.phone || 'N/A';
-            const invoiceNo = d.invoiceNo || 'INV-DIRECT';
-            const ageDays = d.ageDays !== undefined ? d.ageDays : 0;
-            const agingCategory = d.agingCategory || 'Current';
-            const amountDue = Number(d.amountDue) || 0;
-
             let ageBadgeColor = "bg-yellow-100 text-yellow-800";
-            if (ageDays > 90) ageBadgeColor = "bg-red-200 text-red-900 font-bold";
-            else if (ageDays > 60) ageBadgeColor = "bg-red-100 text-red-800";
-            else if (ageDays > 30) ageBadgeColor = "bg-orange-100 text-orange-800";
+            if (d.ageDays > 90) ageBadgeColor = "bg-red-200 text-red-900 font-bold";
+            else if (d.ageDays > 60) ageBadgeColor = "bg-red-100 text-red-800";
+            else if (d.ageDays > 30) ageBadgeColor = "bg-orange-100 text-orange-800";
 
             return `
               <tr class="hover:bg-red-50 border-b">
-                <td class="p-3 font-semibold">${customerName}</td>
-                <td class="p-3">${phone}</td>
-                <td class="p-3 font-mono text-xs">${invoiceNo}</td>
-                <td class="p-3"><span class="px-2 py-1 rounded text-xs ${ageBadgeColor}">${agingCategory} (${ageDays}d)</span></td>
-                <td class="p-3 font-bold text-red-600">KES ${amountDue.toLocaleString()}</td>
+                <td class="p-3 font-semibold">${d.customerName}</td>
+                <td class="p-3">${d.phone || 'N/A'}</td>
+                <td class="p-3 font-mono text-xs">${d.invoiceNo}</td>
+                <td class="p-3"><span class="px-2 py-1 rounded text-xs ${ageBadgeColor}">${d.agingCategory} (${d.ageDays}d)</span></td>
+                <td class="p-3 font-bold text-red-600">KES ${Number(d.amountDue).toLocaleString()}</td>
                 <td class="p-3 text-center">
-                  <button onclick="sendCourteousReminder('${phone}', '${customerName}', '${invoiceNo}', ${amountDue}, ${ageDays})" 
+                  <button onclick="sendCourteousReminder('${d.phone}', '${d.customerName}', '${d.invoiceNo}', ${d.amountDue}, ${d.ageDays})" 
                           class="bg-green-600 hover:bg-green-700 text-white font-bold px-3 py-1.5 rounded text-xs transition shadow flex items-center gap-1 mx-auto">
                     📱 Send Reminder
                   </button>
@@ -631,11 +628,13 @@ Thank you for your payment! 🙏
         }
       } catch (err) {
         console.error("Error loading debtors:", err);
+        if (tbody) tbody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-red-500">Failed to load debtors list.</td></tr>';
       }
     }
 
+    // Firm, professional, and courteous reminder generator
     function sendCourteousReminder(phone, customerName, invoiceNo, amountDue, ageDays) {
-      if (!phone || phone === 'N/A') {
+      if (!phone) {
         alert("Phone number missing for this customer.");
         return;
       }
@@ -643,12 +642,15 @@ Thank you for your payment! 🙏
       let formattedPhone = phone.replace(/[^0-9]/g, '');
       if (formattedPhone.startsWith('0')) formattedPhone = '254' + formattedPhone.slice(1);
 
-      let toneMessage = ageDays > 60
-        ? `We notice invoice *${invoiceNo}* is currently past due (${ageDays} days). Kindly prioritize clearing this balance to ensure uninterrupted water supply services.`
-        : `This is a friendly reminder regarding pending invoice *${invoiceNo}* for KES ${Number(amountDue).toLocaleString()}. Kindly make payment at your earliest convenience.`;
+      let toneMessage = "";
+      if (ageDays > 60) {
+        toneMessage = `We notice invoice *${invoiceNo}* is currently past due (${ageDays} days). Kindly prioritize clearing this balance to ensure uninterrupted water supply services.`;
+      } else {
+        toneMessage = `This is a friendly reminder regarding pending invoice *${invoiceNo}* for KES ${Number(amountDue).toLocaleString()}. Kindly make payment at your earliest convenience.`;
+      }
 
       const text = 
-`Dear ${customerName},
+`Dear ${customerName || 'Valued Customer'},
 
 Hope this message finds you well. 💧
 
@@ -668,7 +670,7 @@ Thank you for your partnership!
     }
 
     // -------------------------------------------------------------
-    // CREATE CUSTOMER
+    // 7. CREATE CUSTOMER LOGIC
     // -------------------------------------------------------------
     async function createCustomer(event) {
       if (event) event.preventDefault();
@@ -680,37 +682,47 @@ Thank you for your partnership!
       const location = document.getElementById('newCustomerLocation').value.trim();
       const meterNumber = document.getElementById('newCustomerMeter').value.trim();
 
-      btn.disabled = true;
-      btn.textContent = "Saving Customer...";
+      if (btn) {
+        btn.disabled = true;
+        btn.textContent = "Saving Customer...";
+      }
+
+      const payload = {
+        action: 'createCustomer',
+        name: name,
+        phone: phone,
+        type: type,
+        location: location,
+        meterNumber: meterNumber,
+        email: '',
+        notes: ''
+      };
 
       try {
         const response = await fetch(SCRIPT_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify({
-            action: 'createCustomer',
-            name: name,
-            phone: phone,
-            type: type,
-            location: location,
-            meterNumber: meterNumber
-          })
+          body: JSON.stringify(payload)
         });
 
         const result = await response.json();
+
         if (result.success) {
           alert('✅ Customer added successfully!');
           document.getElementById('addCustomerForm').reset();
           await loadCustomers();
           switchTab('customers');
         } else {
-          alert('❌ Error: ' + result.message);
+          alert('❌ Error: ' + (result.message || 'Failed to add customer'));
         }
       } catch (err) {
+        console.error("Error creating customer:", err);
         alert('Server communication error.');
       } finally {
-        btn.disabled = false;
-        btn.textContent = "Save Customer";
+        if (btn) {
+          btn.disabled = false;
+          btn.textContent = "Save Customer";
+        }
       }
     }
   </script>
