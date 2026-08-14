@@ -4,10 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Joy Water Supplies - Utility Management</title>
+  
+  <!-- 💧 Favicon Fix (Prevents 404 Console Errors) -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💧</text></svg>">
+
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-100 font-sans leading-normal tracking-normal">
+<body class="bg-gray-100 font-sans leading-normal tracking-normal min-h-screen flex flex-col">
 
   <!-- TOP HEADER -->
   <header class="bg-blue-700 text-white shadow-lg p-4">
@@ -20,25 +24,25 @@
         </div>
       </div>
       <!-- NAVIGATION TABS -->
-      <nav class="flex space-x-2 overflow-x-auto">
-        <button onclick="switchTab('dashboard')" id="tab-dashboard" class="tab-btn px-4 py-2 rounded-lg font-medium text-sm bg-blue-800 hover:bg-blue-600 transition">Dashboard</button>
-        <button onclick="switchTab('recordReading')" id="tab-recordReading" class="tab-btn px-4 py-2 rounded-lg font-medium text-sm hover:bg-blue-600 transition">Record Reading</button>
-        <button onclick="switchTab('recordPayment')" id="tab-recordPayment" class="tab-btn px-4 py-2 rounded-lg font-medium text-sm hover:bg-blue-600 transition">💵 Record Payment</button>
-        <button onclick="switchTab('customers')" id="tab-customers" class="tab-btn px-4 py-2 rounded-lg font-medium text-sm hover:bg-blue-600 transition">Customers</button>
-        <button onclick="switchTab('debtors')" id="tab-debtors" class="tab-btn px-4 py-2 rounded-lg font-medium text-sm hover:bg-blue-600 transition">Debtors</button>
-        <button onclick="switchTab('addCustomer')" id="tab-addCustomer" class="tab-btn px-4 py-2 rounded-lg font-medium text-sm hover:bg-blue-600 transition">+ Add Customer</button>
+      <nav class="flex space-x-2 overflow-x-auto w-full md:w-auto py-1">
+        <button onclick="switchTab('dashboard')" id="tab-dashboard" class="tab-btn px-3 py-2 rounded-lg font-medium text-xs md:text-sm bg-blue-800 hover:bg-blue-600 transition whitespace-nowrap">Dashboard</button>
+        <button onclick="switchTab('recordReading')" id="tab-recordReading" class="tab-btn px-3 py-2 rounded-lg font-medium text-xs md:text-sm hover:bg-blue-600 transition whitespace-nowrap">Record Reading</button>
+        <button onclick="switchTab('recordPayment')" id="tab-recordPayment" class="tab-btn px-3 py-2 rounded-lg font-medium text-xs md:text-sm hover:bg-blue-600 transition whitespace-nowrap">💵 Record Payment</button>
+        <button onclick="switchTab('debtors')" id="tab-debtors" class="tab-btn px-3 py-2 rounded-lg font-medium text-xs md:text-sm hover:bg-blue-600 transition whitespace-nowrap">📊 Aged Debtors</button>
+        <button onclick="switchTab('customers')" id="tab-customers" class="tab-btn px-3 py-2 rounded-lg font-medium text-xs md:text-sm hover:bg-blue-600 transition whitespace-nowrap">Customers</button>
+        <button onclick="switchTab('addCustomer')" id="tab-addCustomer" class="tab-btn px-3 py-2 rounded-lg font-medium text-xs md:text-sm hover:bg-blue-600 transition whitespace-nowrap">+ Add Customer</button>
       </nav>
     </div>
   </header>
 
   <!-- MAIN CONTAINER -->
-  <main class="container mx-auto p-4 md:p-6">
+  <main class="container mx-auto p-4 md:p-6 flex-grow">
 
     <!-- 1. DASHBOARD SECTION -->
     <section id="section-dashboard" class="tab-content">
       <div class="flex justify-between items-center mb-6">
         <h2 class="text-xl font-bold text-gray-800">Overview Dashboard</h2>
-        <button onclick="loadDashboard()" class="text-sm bg-gray-200 hover:bg-gray-300 text-gray-700 px-3 py-1 rounded">🔄 Refresh</button>
+        <button onclick="loadDashboard()" class="text-xs bg-gray-200 hover:bg-gray-300 text-gray-700 px-3 py-1.5 rounded-lg font-semibold transition">🔄 Refresh</button>
       </div>
 
       <!-- METRIC CARDS -->
@@ -102,7 +106,7 @@
               Calculated Consumption: <span id="consumptionPreview" class="text-gray-500 font-bold">0 m³</span>
             </div>
             <div class="text-sm text-gray-700 mt-1">
-              Estimated Bill: <span id="costPreview" class="text-blue-700 font-extrabold text-base">KSh 0.00</span>
+              Estimated Bill: <span id="costPreview" class="text-blue-700 font-extrabold text-base">KES 0.00</span>
             </div>
           </div>
 
@@ -129,17 +133,17 @@
 
           <div class="mb-4">
             <label class="block text-sm font-semibold text-gray-700 mb-1">Invoice ID (Optional)</label>
-            <input type="text" id="paymentInvoiceId" placeholder="e.g. INV-100234 or leave blank for direct account" class="w-full border rounded-lg p-2.5">
+            <input type="text" id="paymentInvoiceId" placeholder="e.g. INV-100234 or leave blank for direct account" class="w-full border rounded-lg p-2.5 border-gray-300">
           </div>
 
           <div class="mb-4">
             <label class="block text-sm font-semibold text-gray-700 mb-1">Amount Paid (KES)</label>
-            <input type="number" id="paymentAmount" step="0.01" placeholder="e.g. 1500" class="w-full border rounded-lg p-2.5" required>
+            <input type="number" id="paymentAmount" step="0.01" placeholder="e.g. 1500" class="w-full border rounded-lg p-2.5 border-gray-300" required>
           </div>
 
           <div class="mb-4">
             <label class="block text-sm font-semibold text-gray-700 mb-1">Payment Mode</label>
-            <select id="paymentMode" class="w-full border rounded-lg p-2.5 bg-gray-50">
+            <select id="paymentMode" class="w-full border rounded-lg p-2.5 bg-gray-50 border-gray-300">
               <option value="M-Pesa">M-Pesa</option>
               <option value="Cash">Cash</option>
               <option value="Bank Transfer">Bank Transfer</option>
@@ -148,7 +152,7 @@
 
           <div class="mb-6">
             <label class="block text-sm font-semibold text-gray-700 mb-1">Transaction Ref / Receipt No.</label>
-            <input type="text" id="paymentReference" placeholder="e.g. QKH78923XY" class="w-full border rounded-lg p-2.5">
+            <input type="text" id="paymentReference" placeholder="e.g. QKH78923XY" class="w-full border rounded-lg p-2.5 border-gray-300">
           </div>
 
           <button type="submit" id="submitPaymentBtn" class="w-full bg-green-600 text-white font-bold py-3 rounded-lg hover:bg-green-700 transition shadow">
@@ -158,10 +162,47 @@
       </div>
     </section>
 
-    <!-- 4. CUSTOMERS SECTION -->
+    <!-- 4. AGED DEBTORS SECTION -->
+    <section id="section-debtors" class="tab-content hidden">
+      <div class="bg-white rounded-xl shadow p-6">
+        <div class="flex justify-between items-center mb-4 border-b pb-3">
+          <div>
+            <h2 class="text-xl font-bold text-gray-800">📊 Aged Debtors & Outstanding Accounts</h2>
+            <p class="text-xs text-gray-500">Track overdue balances categorized by aging periods and send WhatsApp reminders.</p>
+          </div>
+          <button onclick="loadDebtors()" class="text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold px-3 py-1.5 rounded-lg border border-gray-300 transition">
+            🔄 Refresh Debtors
+          </button>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="bg-red-50 border-b text-xs font-semibold text-red-800 uppercase">
+                <th class="p-3">Customer / Phone</th>
+                <th class="p-3">Invoice No.</th>
+                <th class="p-3">Aging Status</th>
+                <th class="p-3">Amount Due</th>
+                <th class="p-3 text-center">Action</th>
+              </tr>
+            </thead>
+            <tbody id="debtorsTableBody" class="divide-y text-xs">
+              <tr><td colspan="5" class="p-4 text-center text-gray-500">Loading aged debtors list...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. CUSTOMERS SECTION -->
     <section id="section-customers" class="tab-content hidden">
       <div class="bg-white rounded-xl shadow p-6">
-        <h2 class="text-xl font-bold text-gray-800 mb-4">Customer Directory</h2>
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-xl font-bold text-gray-800">Customer Directory</h2>
+          <button onclick="loadCustomers()" class="text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold px-3 py-1.5 rounded-lg border border-gray-300 transition">
+            🔄 Refresh List
+          </button>
+        </div>
         <div class="overflow-x-auto">
           <table class="w-full text-left border-collapse">
             <thead>
@@ -173,32 +214,8 @@
                 <th class="p-3">Meter Number</th>
               </tr>
             </thead>
-            <tbody id="customersTableBody" class="divide-y text-sm">
+            <tbody id="customersTableBody" class="divide-y text-xs">
               <tr><td colspan="5" class="p-4 text-center text-gray-500">Loading customers...</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </section>
-
-    <!-- 5. DEBTORS SECTION (UPDATED FOR AGED DEBTORS) -->
-    <section id="section-debtors" class="tab-content hidden">
-      <div class="bg-white rounded-xl shadow p-6">
-        <h2 class="text-xl font-bold text-gray-800 mb-4">Aged Debtors & Outstanding Accounts</h2>
-        <div class="overflow-x-auto">
-          <table class="w-full text-left border-collapse">
-            <thead>
-              <tr class="bg-red-50 border-b text-xs font-semibold text-red-700 uppercase">
-                <th class="p-3">Customer</th>
-                <th class="p-3">Phone</th>
-                <th class="p-3">Invoice No</th>
-                <th class="p-3">Aging Status</th>
-                <th class="p-3">Amount Due</th>
-                <th class="p-3 text-center">Action</th>
-              </tr>
-            </thead>
-            <tbody id="debtorsTableBody" class="divide-y text-sm">
-              <tr><td colspan="6" class="p-4 text-center text-gray-500">Loading debtors list...</td></tr>
             </tbody>
           </table>
         </div>
@@ -212,26 +229,26 @@
         <form id="addCustomerForm" onsubmit="createCustomer(event)">
           <div class="mb-4">
             <label class="block text-sm font-semibold text-gray-700 mb-1">Full Name</label>
-            <input type="text" id="newCustomerName" class="w-full border rounded-lg p-2.5" required>
+            <input type="text" id="newCustomerName" class="w-full border rounded-lg p-2.5 border-gray-300" required>
           </div>
           <div class="mb-4">
             <label class="block text-sm font-semibold text-gray-700 mb-1">Phone Number</label>
-            <input type="text" id="newCustomerPhone" placeholder="07XXXXXXXX" class="w-full border rounded-lg p-2.5" required>
+            <input type="text" id="newCustomerPhone" placeholder="07XXXXXXXX" class="w-full border rounded-lg p-2.5 border-gray-300" required>
           </div>
           <div class="mb-4">
             <label class="block text-sm font-semibold text-gray-700 mb-1">Customer Type</label>
-            <select id="newCustomerType" class="w-full border rounded-lg p-2.5 bg-gray-50" required>
+            <select id="newCustomerType" class="w-full border rounded-lg p-2.5 bg-gray-50 border-gray-300" required>
               <option value="Apartment Tenant">Apartment Tenant</option>
               <option value="Salty Water Vendor">Salty Water Vendor</option>
             </select>
           </div>
           <div class="mb-4">
             <label class="block text-sm font-semibold text-gray-700 mb-1">Location / House No.</label>
-            <input type="text" id="newCustomerLocation" placeholder="e.g. Mlolongo Phase 3 / B9" class="w-full border rounded-lg p-2.5" required>
+            <input type="text" id="newCustomerLocation" placeholder="e.g. Mlolongo Phase 3 / B9" class="w-full border rounded-lg p-2.5 border-gray-300" required>
           </div>
           <div class="mb-6">
             <label class="block text-sm font-semibold text-gray-700 mb-1">Meter Serial Number</label>
-            <input type="text" id="newCustomerMeter" class="w-full border rounded-lg p-2.5" required>
+            <input type="text" id="newCustomerMeter" class="w-full border rounded-lg p-2.5 border-gray-300" required>
           </div>
           <button type="submit" id="addCustomerBtn" class="w-full bg-green-600 text-white font-bold py-3 rounded-lg hover:bg-green-700 transition shadow">
             Save Customer
@@ -239,7 +256,38 @@
         </form>
       </div>
     </section>
+
   </main>
+
+  <!-- WHATSAPP REMINDER PREVIEW MODAL -->
+  <div id="reminderModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-gray-100">
+      <div class="flex justify-between items-center mb-4 border-b pb-3">
+        <h3 class="text-base font-bold text-gray-800 flex items-center gap-2">
+          <span>💬</span> Review Reminder Message
+        </h3>
+        <button onclick="closeReminderModal()" class="text-gray-400 hover:text-gray-600 font-bold text-lg">&times;</button>
+      </div>
+
+      <p class="text-xs text-gray-500 mb-2">You can review and edit the custom reminder below before dispatching to WhatsApp:</p>
+
+      <textarea id="modalReminderText" rows="10" class="w-full p-3 text-xs bg-gray-50 border border-gray-300 rounded-xl font-mono focus:bg-white focus:ring-2 focus:ring-green-500 transition"></textarea>
+
+      <div class="flex justify-end gap-2 mt-4">
+        <button onclick="closeReminderModal()" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg text-xs font-semibold transition">
+          Cancel
+        </button>
+        <button onclick="dispatchWhatsAppMessage()" class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-xs font-bold transition shadow flex items-center gap-1.5">
+          🚀 Launch WhatsApp
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="text-center py-4 text-xs text-gray-500 bg-white border-t border-gray-200 mt-auto">
+    &copy; 2026 Joy Water Supplies. All rights reserved. Powered by MajiHesabu.
+  </footer>
 
   <script>
     // -------------------------------------------------------------
@@ -248,6 +296,7 @@
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwpK9chdjn0UvkLLQq8u7H1DpLGep7SMSPYtxp41_hjvOIlydqRjfQYzPh6OXNzUSnd/exec";
                          
     let globalCustomersList = [];
+    let activeReminderPhone = "";
 
     // -------------------------------------------------------------
     // INITIALIZATION & TAB NAVIGATION
@@ -269,6 +318,7 @@
 
       if (tabName === 'dashboard') loadDashboard();
       if (tabName === 'debtors') loadDebtors();
+      if (tabName === 'customers') loadCustomers();
     }
 
     // -------------------------------------------------------------
@@ -363,12 +413,12 @@
       }
 
       tbody.innerHTML = customers.map(c => `
-        <tr class="hover:bg-gray-50">
+        <tr class="hover:bg-gray-50 transition">
           <td class="p-3 font-mono text-xs">${c.customerId || c.id || '-'}</td>
-          <td class="p-3 font-semibold">${c.name || 'N/A'}</td>
+          <td class="p-3 font-semibold text-gray-800">${c.name || 'N/A'}</td>
           <td class="p-3">${c.phone || 'N/A'}</td>
           <td class="p-3">${c.location || 'N/A'}</td>
-          <td class="p-3 font-mono text-xs text-blue-600">${c.meterNumber || 'N/A'}</td>
+          <td class="p-3 font-mono text-xs text-blue-600 font-bold">${c.meterNumber || 'N/A'}</td>
         </tr>
       `).join('');
     }
@@ -408,7 +458,7 @@
       if (currentVal === "") {
         consumptionDisplay.textContent = "0 m³";
         consumptionDisplay.className = "text-gray-500 font-bold";
-        if (costDisplay) costDisplay.textContent = "KSh 0.00";
+        if (costDisplay) costDisplay.textContent = "KES 0.00";
         if (submitBtn) submitBtn.disabled = false;
         return;
       }
@@ -418,7 +468,7 @@
       if (isNaN(current)) {
         consumptionDisplay.textContent = "Invalid entry";
         consumptionDisplay.className = "text-red-500 font-bold";
-        if (costDisplay) costDisplay.textContent = "KSh 0.00";
+        if (costDisplay) costDisplay.textContent = "KES 0.00";
         if (submitBtn) submitBtn.disabled = true;
         return;
       }
@@ -437,7 +487,7 @@
         if (consumption < 0) {
           consumptionDisplay.textContent = `${consumption.toFixed(2)} m³ (Error: Reading lower than previous)`;
           consumptionDisplay.className = "text-red-600 font-bold";
-          if (costDisplay) costDisplay.textContent = "KSh 0.00";
+          if (costDisplay) costDisplay.textContent = "KES 0.00";
           if (submitBtn) submitBtn.disabled = true;
           return;
         } else {
@@ -449,7 +499,7 @@
 
       if (costDisplay) {
         const estimatedCost = consumption * RATE_PER_UNIT;
-        costDisplay.textContent = `KSh ${estimatedCost.toLocaleString('en-KE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        costDisplay.textContent = `KES ${estimatedCost.toLocaleString('en-KE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
       }
     }
 
@@ -562,13 +612,13 @@
         const result = await response.json();
 
         if (result.success) {
-          alert(`✅ ${result.message}`);
+          alert(`✅ ${result.message || 'Payment recorded successfully!'}`);
           
           document.getElementById('paymentForm').reset();
           await loadCustomers();
           switchTab('dashboard');
         } else {
-          alert(`❌ Error: ${result.message}`);
+          alert(`❌ Error: ${result.message || 'Failed to record payment'}`);
         }
       } catch (err) {
         console.error('Error recording payment:', err);
@@ -586,7 +636,7 @@
     // -------------------------------------------------------------
     async function loadDebtors() {
       const tbody = document.getElementById('debtorsTableBody');
-      if (tbody) tbody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-gray-500">Loading aged debtors...</td></tr>';
+      if (tbody) tbody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-gray-500">Loading aged debtors...</td></tr>';
 
       try {
         const response = await fetch(SCRIPT_URL, {
@@ -596,51 +646,74 @@
         });
 
         const result = await response.json();
+        const debtorsList = result.data || result.debtors || (Array.isArray(result) ? result : []);
 
-        if (result.success && Array.isArray(result.data)) {
-          if (result.data.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-gray-500">🎉 No outstanding debts found!</td></tr>';
-            return;
+        if (debtorsList.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-gray-500">🎉 No outstanding debtors found!</td></tr>';
+          return;
+        }
+
+        tbody.innerHTML = debtorsList.map(item => {
+          const name = item.customerName || item.name || 'Valued Customer';
+          const phone = item.phone || item.customerPhone || 'N/A';
+          const invoiceNo = item.invoiceNo || item.invoiceId || 'N/A';
+          const amountDue = Number(item.amountDue || item.balance || item.amount || 0);
+          const ageDays = Number(item.ageDays || item.daysOverdue || item.agingDays || 0);
+
+          let badgeStyle = "bg-yellow-100 text-yellow-800 border-yellow-200";
+          let statusText = `${ageDays} Days (Current)`;
+
+          if (ageDays > 60) {
+            badgeStyle = "bg-red-100 text-red-800 border-red-200 font-bold";
+            statusText = `${ageDays} Days (Critical)`;
+          } else if (ageDays > 30) {
+            badgeStyle = "bg-orange-100 text-orange-800 border-orange-200";
+            statusText = `${ageDays} Days (Overdue)`;
           }
 
-          tbody.innerHTML = result.data.map(d => {
-            let ageBadgeColor = "bg-yellow-100 text-yellow-800";
-            if (d.ageDays > 90) ageBadgeColor = "bg-red-200 text-red-900 font-bold";
-            else if (d.ageDays > 60) ageBadgeColor = "bg-red-100 text-red-800";
-            else if (d.ageDays > 30) ageBadgeColor = "bg-orange-100 text-orange-800";
+          const escapedName = name.replace(/'/g, "\\'");
 
-            return `
-              <tr class="hover:bg-red-50 border-b">
-                <td class="p-3 font-semibold">${d.customerName}</td>
-                <td class="p-3">${d.phone || 'N/A'}</td>
-                <td class="p-3 font-mono text-xs">${d.invoiceNo}</td>
-                <td class="p-3"><span class="px-2 py-1 rounded text-xs ${ageBadgeColor}">${d.agingCategory} (${d.ageDays}d)</span></td>
-                <td class="p-3 font-bold text-red-600">KES ${Number(d.amountDue).toLocaleString()}</td>
-                <td class="p-3 text-center">
-                  <button onclick="sendCourteousReminder('${d.phone}', '${d.customerName}', '${d.invoiceNo}', ${d.amountDue}, ${d.ageDays})" 
-                          class="bg-green-600 hover:bg-green-700 text-white font-bold px-3 py-1.5 rounded text-xs transition shadow flex items-center gap-1 mx-auto">
-                    📱 Send Reminder
-                  </button>
-                </td>
-              </tr>
-            `;
-          }).join('');
-        }
+          return `
+            <tr class="hover:bg-red-50/50 transition">
+              <td class="p-3">
+                <div class="font-bold text-gray-800">${name}</div>
+                <div class="text-[11px] text-gray-500 font-mono">${phone}</div>
+              </td>
+              <td class="p-3 font-mono font-semibold text-gray-700">${invoiceNo}</td>
+              <td class="p-3">
+                <span class="px-2.5 py-1 rounded-full text-[10px] font-bold border ${badgeStyle}">
+                  ${statusText}
+                </span>
+              </td>
+              <td class="p-3 font-bold text-red-600">
+                KES ${amountDue.toLocaleString()}
+              </td>
+              <td class="p-3 text-center">
+                <button onclick="prepareCourteousReminder('${phone}', '${escapedName}', '${invoiceNo}', ${amountDue}, ${ageDays})" 
+                        class="bg-green-600 hover:bg-green-700 text-white font-bold px-3 py-1.5 rounded-lg text-xs inline-flex items-center gap-1 shadow-sm transition mx-auto">
+                  💬 Remind
+                </button>
+              </td>
+            </tr>
+          `;
+        }).join('');
+
       } catch (err) {
         console.error("Error loading debtors:", err);
-        if (tbody) tbody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-red-500">Failed to load debtors list.</td></tr>';
+        if (tbody) tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-red-500 font-medium">Failed to load debtors list: ${err.message}</td></tr>`;
       }
     }
 
-    // Firm, professional, and courteous reminder generator
-    function sendCourteousReminder(phone, customerName, invoiceNo, amountDue, ageDays) {
-      if (!phone) {
-        alert("Phone number missing for this customer.");
+    // Prepare Courteous Reminder Message & Launch Preview Modal
+    function prepareCourteousReminder(phone, customerName, invoiceNo, amountDue, ageDays) {
+      if (!phone || phone === 'N/A') {
+        alert("Phone number is missing for this customer.");
         return;
       }
 
       let formattedPhone = phone.replace(/[^0-9]/g, '');
       if (formattedPhone.startsWith('0')) formattedPhone = '254' + formattedPhone.slice(1);
+      activeReminderPhone = formattedPhone;
 
       let toneMessage = "";
       if (ageDays > 60) {
@@ -666,7 +739,25 @@ Thank you for your partnership!
 *Joy Water Supplies*
 ☎ 0713 170 222`;
 
-      window.open(`https://wa.me/${formattedPhone}?text=${encodeURIComponent(text)}`, '_blank');
+      document.getElementById('modalReminderText').value = text;
+      document.getElementById('reminderModal').classList.remove('hidden');
+      document.getElementById('reminderModal').classList.add('flex');
+    }
+
+    function closeReminderModal() {
+      document.getElementById('reminderModal').classList.add('hidden');
+      document.getElementById('reminderModal').classList.remove('flex');
+    }
+
+    function dispatchWhatsAppMessage() {
+      const text = document.getElementById('modalReminderText').value;
+      if (!text || !activeReminderPhone) {
+        alert("Invalid message payload or missing recipient phone.");
+        return;
+      }
+
+      window.open(`https://wa.me/${activeReminderPhone}?text=${encodeURIComponent(text)}`, '_blank');
+      closeReminderModal();
     }
 
     // -------------------------------------------------------------
