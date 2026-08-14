@@ -1,535 +1,434 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MajiHesabu - Customer Portal</title>
-    
-    <!-- ✅ CRITICAL: config.js MUST load FIRST before anything else uses it -->
-    <script src="config.js"></script>
-    
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        :root {
-            --primary: #1a3a3a;
-            --secondary: #2d5a5a;
-            --accent: #C49424;
-            --success: #4CAF50;
-            --danger: #ff6b6b;
-            --light-bg: #f5f5f5;
-            --text: #333;
-            --border: #ddd;
-        }
-
-        body {
-            font-family: 'DM Mono', 'Courier New', monospace;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-            color: var(--text);
-            min-height: 100vh;
-        }
-
-        header {
-            background: var(--primary);
-            color: white;
-            padding: 1.5rem;
-            text-align: center;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-        }
-
-        .logo {
-            font-size: 1.8rem;
-            font-weight: bold;
-            color: var(--accent);
-        }
-
-        .container {
-            max-width: 600px;
-            margin: 2rem auto;
-            padding: 1rem;
-        }
-
-        .login-form {
-            background: white;
-            padding: 2rem;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            margin-bottom: 2rem;
-        }
-
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 600;
-            color: var(--primary);
-        }
-
-        input, select {
-            width: 100%;
-            padding: 0.8rem;
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            font-family: inherit;
-            font-size: 1rem;
-        }
-
-        .login-btn {
-            width: 100%;
-            padding: 1rem;
-            background: var(--accent);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
-            font-size: 1rem;
-        }
-
-        .login-btn:hover {
-            opacity: 0.9;
-        }
-
-        .message {
-            padding: 1rem;
-            border-radius: 8px;
-            margin-bottom: 1rem;
-        }
-
-        .message.success {
-            background: #d4edda;
-            color: #155724;
-            border-left: 4px solid var(--success);
-        }
-
-        .message.error {
-            background: #f8d7da;
-            color: #721c24;
-            border-left: 4px solid var(--danger);
-        }
-
-        .dashboard {
-            display: none;
-        }
-
-        .dashboard.active {
-            display: block;
-        }
-
-        .tabs {
-            display: flex;
-            gap: 0.5rem;
-            margin-bottom: 2rem;
-            flex-wrap: wrap;
-        }
-
-        .tab-btn {
-            background: white;
-            border: 2px solid var(--border);
-            padding: 0.8rem 1.5rem;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-        }
-
-        .tab-btn.active {
-            background: var(--accent);
-            color: white;
-        }
-
-        .tab-content {
-            display: none;
-            background: white;
-            padding: 2rem;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        .info-card {
-            background: var(--light-bg);
-            padding: 1.5rem;
-            border-radius: 8px;
-            margin-bottom: 1rem;
-            border-left: 4px solid var(--accent);
-        }
-
-        .info-label {
-            font-size: 0.85rem;
-            color: #666;
-            margin-bottom: 0.3rem;
-        }
-
-        .info-value {
-            font-size: 1.3rem;
-            font-weight: bold;
-            color: var(--primary);
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        table th, table td {
-            padding: 0.8rem;
-            text-align: left;
-            border-bottom: 1px solid var(--border);
-        }
-
-        table th {
-            background: var(--light-bg);
-            font-weight: bold;
-        }
-
-        .logout-btn {
-            background: var(--danger);
-            color: white;
-            border: none;
-            padding: 0.8rem 1.5rem;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Joy Water Supplies - Customer Portal</title>
+  
+  <!-- ✅ CRITICAL: config.js MUST load FIRST -->
+  <script src="config.js"></script>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-    <header>
-        <div class="logo">💧 MajiHesabu</div>
-        <p style="margin-top: 0.5rem; opacity: 0.9;">Customer Portal</p>
-    </header>
+<body class="bg-gray-100 font-sans text-gray-800 min-h-screen flex flex-col">
 
-    <div class="container">
-        <!-- LOGIN SECTION -->
-        <div id="loginSection">
-            <div class="login-form">
-                <h2 style="margin-bottom: 1.5rem; color: var(--primary);">🔓 Login to Your Account</h2>
-                
-                <div id="loginMessage"></div>
+  <!-- HEADER -->
+  <header class="bg-blue-700 text-white shadow-lg p-4">
+    <div class="container mx-auto flex justify-between items-center">
+      <div class="flex items-center space-x-3">
+        <span class="text-3xl">💧</span>
+        <div>
+          <h1 class="text-xl md:text-2xl font-bold">Joy Water Supplies</h1>
+          <p class="text-xs text-blue-200">Customer Self-Service Portal</p>
+        </div>
+      </div>
+      <button id="logoutBtn" onclick="logout()" class="hidden bg-red-500 hover:bg-red-600 text-white text-xs font-bold px-3 py-2 rounded-lg transition shadow">
+        🚪 Logout
+      </button>
+    </div>
+  </header>
 
-                <form onsubmit="handleLogin(event)">
-                    <div class="form-group">
-                        <label for="loginPhone">Phone Number <span style="font-size: 0.8rem; color: #999;">(+254 or 0)</span></label>
-                        <input type="tel" id="loginPhone" placeholder="+254700000001 or 0700000001" required>
-                    </div>
+  <!-- MAIN CONTENT CONTAINER -->
+  <main class="container mx-auto p-4 md:p-6 max-w-2xl flex-grow">
 
-                    <div class="form-group">
-                        <label for="loginMeter">Meter Number</label>
-                        <input type="text" id="loginMeter" placeholder="e.g., M-00123" required>
-                    </div>
+    <!-- 1. LOGIN SECTION -->
+    <div id="loginSection" class="bg-white rounded-2xl shadow-xl p-6 md:p-8 mt-6">
+      <div class="text-center mb-6">
+        <div class="inline-block bg-blue-50 p-4 rounded-full mb-3">
+          <span class="text-4xl">🔓</span>
+        </div>
+        <h2 class="text-2xl font-bold text-gray-800">Login to Your Account</h2>
+        <p class="text-xs text-gray-500 mt-1">Enter your registered phone and meter number to access your account statement.</p>
+      </div>
 
-                    <button type="submit" class="login-btn">🔓 Login to Account</button>
-                </form>
-            </div>
+      <div id="loginMessage" class="mb-4"></div>
+
+      <form onsubmit="handleLogin(event)" class="space-y-4">
+        <div>
+          <label for="loginPhone" class="block text-sm font-semibold text-gray-700 mb-1">
+            Phone Number <span class="text-xs text-gray-400 font-normal">(e.g., 0712345678)</span>
+          </label>
+          <input type="tel" id="loginPhone" placeholder="0712345678 or +254712345678" required
+            class="w-full border rounded-lg p-3 bg-gray-50 text-gray-800 focus:bg-white focus:ring-2 focus:ring-blue-500 border-gray-300 transition">
         </div>
 
-        <!-- DASHBOARD SECTION (Hidden until login) -->
-        <div id="dashboardSection" class="dashboard">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-                <h2 style="color: white;">Welcome, <span id="customerName"></span>!</h2>
-                <button class="logout-btn" onclick="logout()">Logout</button>
-            </div>
-
-            <!-- CUSTOMER INFO -->
-            <div class="info-card">
-                <div class="info-label">Account ID</div>
-                <div class="info-value" id="customerId"></div>
-            </div>
-
-            <div class="info-card">
-                <div class="info-label">Meter Number</div>
-                <div class="info-value" id="customerMeter"></div>
-            </div>
-
-            <div class="info-card">
-                <div class="info-label">Account Type</div>
-                <div class="info-value" id="customerType"></div>
-            </div>
-
-            <!-- TABS -->
-            <div class="tabs">
-                <button class="tab-btn active" onclick="switchTab('invoices')">📋 Invoices</button>
-                <button class="tab-btn" onclick="switchTab('payments')">💳 Payments</button>
-                <button class="tab-btn" onclick="switchTab('trends')">📈 Consumption</button>
-            </div>
-
-            <!-- INVOICES TAB -->
-            <div id="invoices" class="tab-content active">
-                <h3 style="margin-bottom: 1rem;">Recent Invoices</h3>
-                <div id="invoicesList">Loading invoices...</div>
-            </div>
-
-            <!-- PAYMENTS TAB -->
-            <div id="payments" class="tab-content">
-                <h3 style="margin-bottom: 1rem;">Payment History</h3>
-                <div id="paymentsList">Loading payments...</div>
-            </div>
-
-            <!-- TRENDS TAB -->
-            <div id="trends" class="tab-content">
-                <h3 style="margin-bottom: 1rem;">Consumption Trends</h3>
-                <div id="trendsList">Loading trends...</div>
-            </div>
+        <div>
+          <label for="loginMeter" class="block text-sm font-semibold text-gray-700 mb-1">Meter Serial Number</label>
+          <input type="text" id="loginMeter" placeholder="e.g. M-00123" required
+            class="w-full border rounded-lg p-3 bg-gray-50 text-gray-800 focus:bg-white focus:ring-2 focus:ring-blue-500 border-gray-300 transition">
         </div>
+
+        <button type="submit" id="loginBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 rounded-xl transition shadow-lg text-sm uppercase tracking-wider">
+          🔓 Access Account
+        </button>
+      </form>
     </div>
 
-    <script>
-        // ✅ CRITICAL: Make sure SCRIPT_URL is set from config.js
-        const SCRIPT_URL = (typeof CONFIG !== 'undefined' && CONFIG.API_ENDPOINT) 
-            ? CONFIG.API_ENDPOINT 
-            : null;
+    <!-- 2. DASHBOARD SECTION (Hidden by default) -->
+    <div id="dashboardSection" class="hidden space-y-6">
 
-        console.log("🚀 Customer Portal loaded");
-        console.log("CONFIG loaded:", typeof CONFIG !== 'undefined');
-        console.log("SCRIPT_URL:", SCRIPT_URL);
+      <!-- CUSTOMER OVERVIEW CARD -->
+      <div class="bg-gradient-to-r from-blue-700 to-blue-900 text-white rounded-2xl shadow-xl p-6">
+        <div class="flex justify-between items-start border-b border-blue-600/50 pb-4 mb-4">
+          <div>
+            <p class="text-xs text-blue-200 uppercase font-semibold">Welcome Back</p>
+            <h2 id="customerName" class="text-2xl font-extrabold mt-0.5">---</h2>
+          </div>
+          <span id="customerTypeBadge" class="bg-blue-500/40 text-blue-100 text-xs font-semibold px-2.5 py-1 rounded-full border border-blue-400/30">
+            Tenant
+          </span>
+        </div>
 
-        // Store current customer
-        let currentCustomer = null;
+        <div class="grid grid-cols-2 gap-4 text-sm">
+          <div>
+            <p class="text-xs text-blue-200">Account ID</p>
+            <p id="customerId" class="font-mono font-bold text-white">---</p>
+          </div>
+          <div>
+            <p class="text-xs text-blue-200">Meter Number</p>
+            <p id="customerMeter" class="font-mono font-bold text-white">---</p>
+          </div>
+        </div>
+      </div>
 
-        // Handle Login
-        async function handleLogin(event) {
-            event.preventDefault();
+      <!-- TABS NAVIGATION -->
+      <div class="flex space-x-2 bg-gray-200 p-1.5 rounded-xl text-xs md:text-sm font-bold text-gray-600">
+        <button onclick="switchTab('invoices')" id="tab-invoices" class="tab-btn flex-1 py-2.5 text-center rounded-lg bg-white text-blue-700 shadow transition">
+          📋 Invoices
+        </button>
+        <button onclick="switchTab('payments')" id="tab-payments" class="tab-btn flex-1 py-2.5 text-center rounded-lg hover:text-blue-700 transition">
+          💳 Payments
+        </button>
+        <button onclick="switchTab('trends')" id="tab-trends" class="tab-btn flex-1 py-2.5 text-center rounded-lg hover:text-blue-700 transition">
+          📈 Usage
+        </button>
+      </div>
 
-            const phone = document.getElementById('loginPhone').value;
-            const meterNumber = document.getElementById('loginMeter').value;
+      <!-- TAB CONTENTS -->
+      <div class="bg-white rounded-2xl shadow-md p-5 border border-gray-100">
+        
+        <!-- INVOICES TAB -->
+        <div id="invoicesTab" class="tab-content">
+          <h3 class="text-base font-bold text-gray-800 mb-4 border-b pb-2">Recent Invoices</h3>
+          <div id="invoicesList" class="overflow-x-auto text-sm">
+            <p class="text-center text-gray-400 py-4">Loading invoices...</p>
+          </div>
+        </div>
 
-            console.log("🔐 Attempting login with:", { phone, meterNumber });
-            console.log("Using API URL:", SCRIPT_URL);
+        <!-- PAYMENTS TAB -->
+        <div id="paymentsTab" class="tab-content hidden">
+          <h3 class="text-base font-bold text-gray-800 mb-4 border-b pb-2">Payment Receipts</h3>
+          <div id="paymentsList" class="overflow-x-auto text-sm">
+            <p class="text-center text-gray-400 py-4">Loading payment history...</p>
+          </div>
+        </div>
 
-            if (!SCRIPT_URL) {
-                showLoginMessage("❌ Configuration error: API endpoint not set", true);
-                return;
-            }
+        <!-- USAGE / TRENDS TAB -->
+        <div id="trendsTab" class="tab-content hidden">
+          <h3 class="text-base font-bold text-gray-800 mb-4 border-b pb-2">Monthly Consumption Trends</h3>
+          <div id="trendsList" class="overflow-x-auto text-sm">
+            <p class="text-center text-gray-400 py-4">Loading consumption trends...</p>
+          </div>
+        </div>
 
-            try {
-                const response = await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                    body: JSON.stringify({ 
-                        action: 'authenticate', 
-                        phone: phone, 
-                        meterNumber: meterNumber 
-                    })
-                });
+      </div>
 
-                const text = await response.text();
-                console.log("Response status:", response.status);
-                console.log("Response text:", text.substring(0, 200));
+      <!-- DIRECT WHATSAPP SUPPORT ACTION -->
+      <div class="bg-green-50 border border-green-200 rounded-xl p-4 flex items-center justify-between">
+        <div>
+          <p class="text-xs font-bold text-green-800">Need Assistance or Reconciliation?</p>
+          <p class="text-xs text-green-600">Contact our support team directly via WhatsApp.</p>
+        </div>
+        <a href="https://wa.me/254713170222?text=Hello%20Joy%20Water%20Supplies,%20I%20have%20an%20inquiry%20regarding%20my%20account." 
+           target="_blank" 
+           class="bg-green-600 hover:bg-green-700 text-white font-bold px-3 py-2 rounded-lg text-xs transition shadow flex items-center gap-1">
+          💬 Support
+        </a>
+      </div>
 
-                if (text.trim().startsWith('<')) {
-                    throw new Error("Server returned HTML error (405 or similar)");
-                }
+    </div>
 
-                const result = JSON.parse(text);
-                console.log("Login result:", result);
+  </main>
 
-                if (result.authenticated) {
-                    currentCustomer = result;
-                    showCustomerDashboard();
-                    showLoginMessage("", false);
-                } else {
-                    showLoginMessage("❌ Invalid phone or meter number", true);
-                }
-            } catch (err) {
-                console.error('Login error:', err);
-                showLoginMessage("❌ Connection error. " + err.message, true);
-            }
+  <!-- FOOTER -->
+  <footer class="text-center py-4 text-xs text-gray-400">
+    &copy; 2026 Joy Water Supplies. Powered by MajiHesabu Engine.
+  </footer>
+
+  <script>
+    // ✅ CRITICAL: Make sure SCRIPT_URL is set from config.js
+    const SCRIPT_URL = (typeof CONFIG !== 'undefined' && CONFIG.API_ENDPOINT) 
+      ? CONFIG.API_ENDPOINT 
+      : null;
+
+    let currentCustomer = null;
+
+    document.addEventListener("DOMContentLoaded", () => {
+      // Check for saved local session
+      const savedSession = localStorage.getItem("jiw_customer_session");
+      if (savedSession) {
+        try {
+          currentCustomer = JSON.parse(savedSession);
+          showCustomerDashboard();
+        } catch (e) {
+          localStorage.removeItem("jiw_customer_session");
+        }
+      }
+    });
+
+    // Handle Login Submit
+    async function handleLogin(event) {
+      if (event) event.preventDefault();
+
+      const phone = document.getElementById('loginPhone').value.trim();
+      const meterNumber = document.getElementById('loginMeter').value.trim();
+      const loginBtn = document.getElementById('loginBtn');
+
+      if (!SCRIPT_URL) {
+        showLoginMessage("❌ Configuration error: API endpoint not set in config.js", true);
+        return;
+      }
+
+      loginBtn.disabled = true;
+      loginBtn.textContent = "Authenticating...";
+
+      try {
+        const response = await fetch(SCRIPT_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({ 
+            action: 'authenticate', 
+            phone: phone, 
+            meterNumber: meterNumber 
+          })
+        });
+
+        const text = await response.text();
+        if (text.trim().startsWith('<')) {
+          throw new Error("Server response error. Please verify API configuration.");
         }
 
-        function showLoginMessage(message, isError) {
-            const el = document.getElementById('loginMessage');
-            if (message) {
-                el.innerHTML = `<div class="message ${isError ? 'error' : 'success'}">${message}</div>`;
-            } else {
-                el.innerHTML = '';
-            }
+        const result = JSON.parse(text);
+
+        if (result.authenticated || result.success) {
+          currentCustomer = result;
+          localStorage.setItem("jiw_customer_session", JSON.stringify(result));
+          showCustomerDashboard();
+          showLoginMessage("", false);
+        } else {
+          showLoginMessage("❌ Invalid phone or meter number. Please check your inputs.", true);
         }
+      } catch (err) {
+        showLoginMessage("❌ Connection error: " + err.message, true);
+      } font-medium {
+        loginBtn.disabled = false;
+        loginBtn.textContent = "🔓 Access Account";
+      }
+    }
 
-        function showCustomerDashboard() {
-            document.getElementById('loginSection').style.display = 'none';
-            document.getElementById('dashboardSection').classList.add('active');
+    function showLoginMessage(message, isError) {
+      const el = document.getElementById('loginMessage');
+      if (message) {
+        el.innerHTML = `
+          <div class="p-3 rounded-lg text-xs font-semibold ${isError ? 'bg-red-50 text-red-700 border border-red-200' : 'bg-green-50 text-green-700 border border-green-200'}">
+            ${message}
+          </div>`;
+      } else {
+        el.innerHTML = '';
+      }
+    }
 
-            document.getElementById('customerId').innerText = currentCustomer.customerId;
-            document.getElementById('customerName').innerText = currentCustomer.name;
-            document.getElementById('customerMeter').innerText = currentCustomer.meterNumber;
-            document.getElementById('customerType').innerText = currentCustomer.type;
+    function showCustomerDashboard() {
+      document.getElementById('loginSection').classList.add('hidden');
+      document.getElementById('dashboardSection').classList.remove('hidden');
+      document.getElementById('logoutBtn').classList.remove('hidden');
 
-            loadInvoices();
-            loadPayments();
-            loadTrends();
+      document.getElementById('customerId').innerText = currentCustomer.customerId || 'N/A';
+      document.getElementById('customerName').innerText = currentCustomer.name || 'Valued Customer';
+      document.getElementById('customerMeter').innerText = currentCustomer.meterNumber || 'N/A';
+      document.getElementById('customerTypeBadge').innerText = currentCustomer.type || 'Standard';
+
+      loadInvoices();
+      loadPayments();
+      loadTrends();
+    }
+
+    // Load Invoices
+    async function loadInvoices() {
+      const listEl = document.getElementById('invoicesList');
+      try {
+        const response = await fetch(SCRIPT_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({ 
+            action: 'getInvoiceHistory', 
+            customerId: currentCustomer.customerId, 
+            months: 6 
+          })
+        });
+
+        const text = await response.text();
+        if (text.trim().startsWith('<')) throw new Error("Server response error");
+
+        const data = JSON.parse(text);
+        const invoices = data.invoices || data.data || [];
+
+        if (invoices.length > 0) {
+          listEl.innerHTML = `
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="bg-gray-50 border-b text-xs font-semibold text-gray-500 uppercase">
+                  <th class="p-2.5">Month/Date</th>
+                  <th class="p-2.5">Amount</th>
+                  <th class="p-2.5">Status</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y text-xs">
+                ${invoices.map(inv => {
+                  const status = inv.status || 'UNPAID';
+                  const isPaid = status.toUpperCase() === 'PAID';
+                  return `
+                    <tr class="hover:bg-gray-50">
+                      <td class="p-2.5 font-medium">${inv.month || inv.date || 'N/A'}</td>
+                      <td class="p-2.5 font-bold">KES ${(Number(inv.totalAmount || inv.amount) || 0).toLocaleString()}</td>
+                      <td class="p-2.5">
+                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${isPaid ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
+                          ${status}
+                        </span>
+                      </td>
+                    </tr>
+                  `;
+                }).join('')}
+              </tbody>
+            </table>`;
+        } else {
+          listEl.innerHTML = '<p class="text-center text-gray-400 py-4">No recent invoices found.</p>';
         }
+      } catch (err) {
+        listEl.innerHTML = '<p class="text-center text-red-500 py-4">Unable to load invoices.</p>';
+      }
+    }
 
-        async function loadInvoices() {
-            try {
-                const response = await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                    body: JSON.stringify({ 
-                        action: 'getInvoiceHistory', 
-                        customerId: currentCustomer.customerId, 
-                        months: 6 
-                    })
-                });
+    // Load Payments
+    async function loadPayments() {
+      const listEl = document.getElementById('paymentsList');
+      try {
+        const response = await fetch(SCRIPT_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({ 
+            action: 'getPaymentHistory', 
+            customerId: currentCustomer.customerId 
+          })
+        });
 
-                const text = await response.text();
-                if (text.trim().startsWith('<')) throw new Error("Server error");
+        const text = await response.text();
+        if (text.trim().startsWith('<')) throw new Error("Server response error");
 
-                const data = JSON.parse(text);
-                const invoices = data.invoices || data.success ? data.invoices : [];
+        const data = JSON.parse(text);
+        const payments = data.payments || data.data || [];
 
-                const listEl = document.getElementById('invoicesList');
-                if (invoices.length > 0) {
-                    listEl.innerHTML = `
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Month</th>
-                                    <th>Amount</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                ${invoices.map(inv => `
-                                    <tr>
-                                        <td>${inv.month}</td>
-                                        <td>KES ${(inv.totalAmount || 0).toLocaleString()}</td>
-                                        <td>${inv.status}</td>
-                                    </tr>
-                                `).join('')}
-                            </tbody>
-                        </table>
-                    `;
-                } else {
-                    listEl.innerHTML = '<p style="text-align: center; color: #999;">No invoices found</p>';
-                }
-            } catch (err) {
-                console.error('Invoices error:', err);
-                document.getElementById('invoicesList').innerHTML = '<p style="color: red;">Error loading invoices</p>';
-            }
+        if (payments.length > 0) {
+          listEl.innerHTML = `
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="bg-gray-50 border-b text-xs font-semibold text-gray-500 uppercase">
+                  <th class="p-2.5">Date</th>
+                  <th class="p-2.5">Amount</th>
+                  <th class="p-2.5">Method</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y text-xs">
+                ${payments.map(pay => `
+                  <tr class="hover:bg-gray-50">
+                    <td class="p-2.5 font-medium">${pay.paymentDate || pay.date || 'N/A'}</td>
+                    <td class="p-2.5 font-bold text-green-600">KES ${(Number(pay.amount) || 0).toLocaleString()}</td>
+                    <td class="p-2.5 text-gray-500">${pay.method || pay.paymentMethod || 'M-Pesa'}</td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>`;
+        } else {
+          listEl.innerHTML = '<p class="text-center text-gray-400 py-4">No payment history found.</p>';
         }
+      } catch (err) {
+        listEl.innerHTML = '<p class="text-center text-red-500 py-4">Unable to load payment history.</p>';
+      }
+    }
 
-        async function loadPayments() {
-            try {
-                const response = await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                    body: JSON.stringify({ 
-                        action: 'getPaymentHistory', 
-                        customerId: currentCustomer.customerId 
-                    })
-                });
+    // Load Usage / Trends
+    async function loadTrends() {
+      const listEl = document.getElementById('trendsList');
+      try {
+        const response = await fetch(SCRIPT_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({ 
+            action: 'getConsumptionTrends', 
+            customerId: currentCustomer.customerId, 
+            months: 6 
+          })
+        });
 
-                const text = await response.text();
-                if (text.trim().startsWith('<')) throw new Error("Server error");
+        const text = await response.text();
+        if (text.trim().startsWith('<')) throw new Error("Server response error");
 
-                const data = JSON.parse(text);
-                const payments = data.payments || [];
+        const data = JSON.parse(text);
+        const trends = data.trends || data.data || [];
 
-                const listEl = document.getElementById('paymentsList');
-                if (payments.length > 0) {
-                    listEl.innerHTML = `
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Date</th>
-                                    <th>Amount</th>
-                                    <th>Method</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                ${payments.map(pay => `
-                                    <tr>
-                                        <td>${pay.paymentDate}</td>
-                                        <td>KES ${(pay.amount || 0).toLocaleString()}</td>
-                                        <td>${pay.method}</td>
-                                    </tr>
-                                `).join('')}
-                            </tbody>
-                        </table>
-                    `;
-                } else {
-                    listEl.innerHTML = '<p style="text-align: center; color: #999;">No payments found</p>';
-                }
-            } catch (err) {
-                console.error('Payments error:', err);
-                document.getElementById('paymentsList').innerHTML = '<p style="color: red;">Error loading payments</p>';
-            }
+        if (trends.length > 0) {
+          listEl.innerHTML = `
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="bg-gray-50 border-b text-xs font-semibold text-gray-500 uppercase">
+                  <th class="p-2.5">Month</th>
+                  <th class="p-2.5">Consumption</th>
+                  <th class="p-2.5">Billed Amount</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y text-xs">
+                ${trends.map(t => `
+                  <tr class="hover:bg-gray-50">
+                    <td class="p-2.5 font-medium">${t.month || 'N/A'}</td>
+                    <td class="p-2.5 font-bold text-blue-600">${t.consumption || 0} m³</td>
+                    <td class="p-2.5 font-semibold">KES ${(Number(t.amount) || 0).toLocaleString()}</td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>`;
+        } else {
+          listEl.innerHTML = '<p class="text-center text-gray-400 py-4">No consumption trends recorded.</p>';
         }
+      } catch (err) {
+        listEl.innerHTML = '<p class="text-center text-red-500 py-4">Unable to load consumption trends.</p>';
+      }
+    }
 
-        async function loadTrends() {
-            try {
-                const response = await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                    body: JSON.stringify({ 
-                        action: 'getConsumptionTrends', 
-                        customerId: currentCustomer.customerId, 
-                        months: 6 
-                    })
-                });
+    // Tab Switcher
+    function switchTab(tabName) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('bg-white', 'text-blue-700', 'shadow');
+      });
 
-                const text = await response.text();
-                if (text.trim().startsWith('<')) throw new Error("Server error");
+      const activeTabBtn = document.getElementById(`tab-${tabName}`);
+      const activeContent = document.getElementById(`${tabName}Tab`);
 
-                const data = JSON.parse(text);
-                const trends = data.trends || [];
+      if (activeTabBtn) activeTabBtn.classList.add('bg-white', 'text-blue-700', 'shadow');
+      if (activeContent) activeContent.classList.remove('hidden');
+    }
 
-                const listEl = document.getElementById('trendsList');
-                if (trends.length > 0) {
-                    listEl.innerHTML = `
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Month</th>
-                                    <th>Consumption (units)</th>
-                                    <th>Amount (KES)</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                ${trends.map(trend => `
-                                    <tr>
-                                        <td>${trend.month}</td>
-                                        <td>${trend.consumption}</td>
-                                        <td>KES ${(trend.amount || 0).toLocaleString()}</td>
-                                    </tr>
-                                `).join('')}
-                            </tbody>
-                        </table>
-                    `;
-                } else {
-                    listEl.innerHTML = '<p style="text-align: center; color: #999;">No trends found</p>';
-                }
-            } catch (err) {
-                console.error('Trends error:', err);
-                document.getElementById('trendsList').innerHTML = '<p style="color: red;">Error loading trends</p>';
-            }
-        }
-
-        function switchTab(tabName) {
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-
-            event.target.classList.add('active');
-            document.getElementById(tabName).classList.add('active');
-        }
-
-        function logout() {
-            currentCustomer = null;
-            document.getElementById('loginSection').style.display = 'block';
-            document.getElementById('dashboardSection').classList.remove('active');
-            document.getElementById('loginPhone').value = '';
-            document.getElementById('loginMeter').value = '';
-        }
-    </script>
+    // Logout
+    function logout() {
+      currentCustomer = null;
+      localStorage.removeItem("jiw_customer_session");
+      document.getElementById('loginSection').classList.remove('hidden');
+      document.getElementById('dashboardSection').classList.add('hidden');
+      document.getElementById('logoutBtn').classList.add('hidden');
+      document.getElementById('loginPhone').value = '';
+      document.getElementById('loginMeter').value = '';
+    }
+  </script>
 </body>
 </html>
