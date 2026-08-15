@@ -528,5 +528,30 @@
       document.getElementById('loginMeter').value = '';
     }
   </script>
+  <script>
+  let currentCustomer = null;
+
+  function logoutCustomer() {
+    currentCustomer = null;
+    localStorage.removeItem("jiw_customer_session");
+    
+    // UI Toggles
+    document.getElementById('loginSection').classList.remove('hidden');
+    document.getElementById('dashboardSection').classList.add('hidden');
+    document.getElementById('logoutBtn').classList.add('hidden');
+    
+    // Clear Customer Inputs
+    document.getElementById('loginPhone').value = '';
+    document.getElementById('loginMeter').value = '';
+  }
+
+  function switchTab(evt, tabName) {
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+    evt.currentTarget.classList.add('active');
+    document.getElementById(tabName).classList.add('active');
+  }
+</script>
 </body>
 </html>
