@@ -3,818 +3,529 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Joy Water Supplies - Utility Management</title>
+  <title>Joy Water Supplies - Admin Portal</title>
   
-  <!-- 💧 Favicon Fix (Prevents 404 Console Errors) -->
+  <!-- 💧 Favicon Fix (Prevents 404 Console Error) -->
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💧</text></svg>">
 
-  <!-- Tailwind CSS CDN -->
+  <!-- ✅ CRITICAL: config.js MUST load FIRST -->
+  <script src="config.js"></script>
+  
+  <!-- Tailwind CSS CDN (For production, compile with Tailwind CLI or use PostCSS) -->
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-100 font-sans leading-normal tracking-normal min-h-screen flex flex-col">
+<body class="bg-gray-100 font-sans text-gray-800 min-h-screen flex flex-col">
 
-  <!-- TOP HEADER -->
-  <header class="bg-blue-700 text-white shadow-lg p-4">
-    <div class="container mx-auto flex flex-col md:flex-row justify-between items-center">
-      <div class="flex items-center space-x-3 mb-2 md:mb-0">
+  <!-- HEADER -->
+  <header class="bg-blue-800 text-white shadow-lg p-4">
+    <div class="container mx-auto flex justify-between items-center">
+      <div class="flex items-center space-x-3">
         <span class="text-3xl">💧</span>
         <div>
-          <h1 class="text-2xl font-bold">Joy Water Supplies</h1>
-          <p class="text-xs text-blue-200">Mlolongo Utility Management System</p>
+          <h1 class="text-xl md:text-2xl font-bold">Joy Water Supplies</h1>
+          <p class="text-xs text-blue-200">Management & Administrative Portal</p>
         </div>
       </div>
-      <!-- NAVIGATION TABS -->
-      <nav class="flex space-x-2 overflow-x-auto w-full md:w-auto py-1">
-        <button onclick="switchTab('dashboard')" id="tab-dashboard" class="tab-btn px-3 py-2 rounded-lg font-medium text-xs md:text-sm bg-blue-800 hover:bg-blue-600 transition whitespace-nowrap">Dashboard</button>
-        <button onclick="switchTab('recordReading')" id="tab-recordReading" class="tab-btn px-3 py-2 rounded-lg font-medium text-xs md:text-sm hover:bg-blue-600 transition whitespace-nowrap">Record Reading</button>
-        <button onclick="switchTab('recordPayment')" id="tab-recordPayment" class="tab-btn px-3 py-2 rounded-lg font-medium text-xs md:text-sm hover:bg-blue-600 transition whitespace-nowrap">💵 Record Payment</button>
-        <button onclick="switchTab('debtors')" id="tab-debtors" class="tab-btn px-3 py-2 rounded-lg font-medium text-xs md:text-sm hover:bg-blue-600 transition whitespace-nowrap">📊 Aged Debtors</button>
-        <button onclick="switchTab('customers')" id="tab-customers" class="tab-btn px-3 py-2 rounded-lg font-medium text-xs md:text-sm hover:bg-blue-600 transition whitespace-nowrap">Customers</button>
-        <button onclick="switchTab('addCustomer')" id="tab-addCustomer" class="tab-btn px-3 py-2 rounded-lg font-medium text-xs md:text-sm hover:bg-blue-600 transition whitespace-nowrap">+ Add Customer</button>
-      </nav>
+      <button id="logoutBtn" onclick="logout()" class="hidden bg-red-500 hover:bg-red-600 text-white text-xs font-bold px-3 py-2 rounded-lg transition shadow">
+        🚪 Logout
+      </button>
     </div>
   </header>
 
-  <!-- MAIN CONTAINER -->
-  <main class="container mx-auto p-4 md:p-6 flex-grow">
+  <!-- MAIN CONTENT CONTAINER -->
+  <main class="container mx-auto p-4 md:p-6 max-w-4xl flex-grow">
 
-    <!-- 1. DASHBOARD SECTION -->
-    <section id="section-dashboard" class="tab-content">
-      <div class="flex justify-between items-center mb-6">
-        <h2 class="text-xl font-bold text-gray-800">Overview Dashboard</h2>
-        <button onclick="loadDashboard()" class="text-xs bg-gray-200 hover:bg-gray-300 text-gray-700 px-3 py-1.5 rounded-lg font-semibold transition">🔄 Refresh</button>
+    <!-- 1. ADMIN LOGIN SECTION -->
+    <div id="loginSection" class="bg-white rounded-2xl shadow-xl p-6 md:p-8 mt-6 max-w-md mx-auto">
+      <div class="text-center mb-6">
+        <div class="inline-block bg-blue-50 p-4 rounded-full mb-3">
+          <span class="text-4xl">🔐</span>
+        </div>
+        <h2 class="text-2xl font-bold text-gray-800">Admin Login</h2>
+        <p class="text-xs text-gray-500 mt-1">Enter your admin credentials to access system management.</p>
       </div>
 
-      <!-- METRIC CARDS -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <div class="bg-white p-5 rounded-xl shadow border-l-4 border-blue-500">
-          <p class="text-xs font-bold text-gray-500 uppercase tracking-wider">Total Revenue</p>
-          <p id="totalRevenueDisplay" class="text-2xl font-extrabold text-gray-800 mt-1">KES 0.00</p>
+      <div id="loginMessage" class="mb-4"></div>
+
+      <form onsubmit="handleLogin(event)" class="space-y-4">
+        <div>
+          <label for="loginPhone" class="block text-sm font-semibold text-gray-700 mb-1">
+            Admin Phone / Username
+          </label>
+          <input type="tel" id="loginPhone" placeholder="0712345678" required
+            class="w-full border rounded-lg p-3 bg-gray-50 text-gray-800 focus:bg-white focus:ring-2 focus:ring-blue-500 border-gray-300 transition">
         </div>
-        <div class="bg-white p-5 rounded-xl shadow border-l-4 border-green-500">
-          <p class="text-xs font-bold text-gray-500 uppercase tracking-wider">Total Collected</p>
-          <p id="totalCollectedDisplay" class="text-2xl font-extrabold text-green-600 mt-1">KES 0.00</p>
+
+        <div>
+          <label for="loginMeter" class="block text-sm font-semibold text-gray-700 mb-1">Admin Passcode / Key</label>
+          <input type="password" id="loginMeter" placeholder="••••••••" required
+            class="w-full border rounded-lg p-3 bg-gray-50 text-gray-800 focus:bg-white focus:ring-2 focus:ring-blue-500 border-gray-300 transition">
         </div>
-        <div class="bg-white p-5 rounded-xl shadow border-l-4 border-red-500">
-          <p class="text-xs font-bold text-gray-500 uppercase tracking-wider">Outstanding Balance</p>
-          <p id="outstandingBalanceDisplay" class="text-2xl font-extrabold text-red-600 mt-1">KES 0.00</p>
-        </div>
-        <div class="bg-white p-5 rounded-xl shadow border-l-4 border-purple-500">
-          <p class="text-xs font-bold text-gray-500 uppercase tracking-wider">Collection Rate</p>
-          <p id="collectionRateDisplay" class="text-2xl font-extrabold text-purple-600 mt-1">0.0%</p>
-        </div>
-      </div>
-    </section>
 
-    <!-- 2. RECORD METER READING SECTION -->
-    <section id="section-recordReading" class="tab-content hidden">
-      <div class="max-w-xl mx-auto bg-white rounded-xl shadow-md p-6">
-        <h2 class="text-xl font-bold text-gray-800 mb-4 border-b pb-2">Record Meter Reading</h2>
-        
-        <form id="meterReadingForm" onsubmit="recordReading(event)">
-          <!-- Select Customer -->
-          <div class="mb-4">
-            <label class="block text-sm font-semibold text-gray-700 mb-1">Customer / Meter</label>
-            <select id="customerSelect" onchange="onCustomerSelectChange()" class="w-full border rounded-lg p-2.5 bg-gray-50 focus:ring-2 focus:ring-blue-500" required>
-              <option value="">-- Loading customers... --</option>
-            </select>
-          </div>
+        <button type="submit" id="loginBtn" class="w-full bg-blue-700 hover:bg-blue-800 text-white font-bold py-3.5 rounded-xl transition shadow-lg text-sm uppercase tracking-wider">
+          🔓 Access Admin Portal
+        </button>
+      </form>
+    </div>
 
-          <!-- Previous Reading (Read-only) -->
-          <div class="mb-4">
-            <label class="block text-sm font-semibold text-gray-700 mb-1">Previous Reading (m³)</label>
-            <input type="number" id="prevReadingInput" readonly disabled value="0" class="w-full border rounded-lg p-2.5 bg-gray-100 font-semibold text-gray-600">
-          </div>
+    <!-- 2. ADMIN DASHBOARD SECTION (Hidden by default) -->
+    <div id="dashboardSection" class="hidden space-y-6">
 
-          <!-- Current Reading Input -->
-          <div class="mb-2">
-            <label class="block text-sm font-semibold text-gray-700 mb-1">Current Reading (m³)</label>
-            <input type="number" id="currentReadingInput" step="0.01" oninput="calculateConsumption()" placeholder="Enter current reading" class="w-full border rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500" required>
-          </div>
-
-          <!-- Rollover Checkbox -->
-          <div class="mb-4 flex items-center mt-2">
-            <input type="checkbox" id="isRolloverCheckbox" onchange="calculateConsumption()" class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500">
-            <label for="isRolloverCheckbox" class="ml-2 text-sm font-medium text-gray-700 select-none">
-              Meter replaced or reset (Rollover)
-            </label>
-          </div>
-
-          <!-- Live Preview Box -->
-          <div class="p-4 bg-blue-50 border border-blue-200 rounded-lg mb-6">
-            <div class="text-sm text-gray-700">
-              Calculated Consumption: <span id="consumptionPreview" class="text-gray-500 font-bold">0 m³</span>
-            </div>
-            <div class="text-sm text-gray-700 mt-1">
-              Estimated Bill: <span id="costPreview" class="text-blue-700 font-extrabold text-base">KES 0.00</span>
-            </div>
-          </div>
-
-          <!-- Submit Button -->
-          <button type="submit" id="submitReadingBtn" class="w-full bg-blue-600 text-white font-bold py-3 rounded-lg hover:bg-blue-700 transition shadow">
-            Record Reading & Generate Invoice
-          </button>
-        </form>
-      </div>
-    </section>
-
-    <!-- 3. RECORD MANUAL PAYMENT SECTION -->
-    <section id="section-recordPayment" class="tab-content hidden">
-      <div class="max-w-xl mx-auto bg-white rounded-xl shadow-md p-6">
-        <h2 class="text-xl font-bold text-gray-800 mb-4 border-b pb-2">Record Payment</h2>
-        
-        <form id="paymentForm" onsubmit="recordManualPayment(event)">
-          <div class="mb-4">
-            <label class="block text-sm font-semibold text-gray-700 mb-1">Select Customer</label>
-            <select id="paymentCustomerSelect" class="w-full border rounded-lg p-2.5 bg-gray-50 focus:ring-2 focus:ring-blue-500" required>
-              <option value="">-- Select Customer --</option>
-            </select>
-          </div>
-
-          <div class="mb-4">
-            <label class="block text-sm font-semibold text-gray-700 mb-1">Invoice ID (Optional)</label>
-            <input type="text" id="paymentInvoiceId" placeholder="e.g. INV-100234 or leave blank for direct account" class="w-full border rounded-lg p-2.5 border-gray-300">
-          </div>
-
-          <div class="mb-4">
-            <label class="block text-sm font-semibold text-gray-700 mb-1">Amount Paid (KES)</label>
-            <input type="number" id="paymentAmount" step="0.01" placeholder="e.g. 1500" class="w-full border rounded-lg p-2.5 border-gray-300" required>
-          </div>
-
-          <div class="mb-4">
-            <label class="block text-sm font-semibold text-gray-700 mb-1">Payment Mode</label>
-            <select id="paymentMode" class="w-full border rounded-lg p-2.5 bg-gray-50 border-gray-300">
-              <option value="M-Pesa">M-Pesa</option>
-              <option value="Cash">Cash</option>
-              <option value="Bank Transfer">Bank Transfer</option>
-            </select>
-          </div>
-
-          <div class="mb-6">
-            <label class="block text-sm font-semibold text-gray-700 mb-1">Transaction Ref / Receipt No.</label>
-            <input type="text" id="paymentReference" placeholder="e.g. QKH78923XY" class="w-full border rounded-lg p-2.5 border-gray-300">
-          </div>
-
-          <button type="submit" id="submitPaymentBtn" class="w-full bg-green-600 text-white font-bold py-3 rounded-lg hover:bg-green-700 transition shadow">
-            Record Payment & Issue Receipt
-          </button>
-        </form>
-      </div>
-    </section>
-
-    <!-- 4. AGED DEBTORS SECTION -->
-    <section id="section-debtors" class="tab-content hidden">
-      <div class="bg-white rounded-xl shadow p-6">
-        <div class="flex justify-between items-center mb-4 border-b pb-3">
+      <!-- ADMIN OVERVIEW CARD -->
+      <div class="bg-gradient-to-r from-blue-800 to-indigo-900 text-white rounded-2xl shadow-xl p-6">
+        <div class="flex justify-between items-start border-b border-blue-600/50 pb-4 mb-4">
           <div>
-            <h2 class="text-xl font-bold text-gray-800">📊 Aged Debtors & Outstanding Accounts</h2>
-            <p class="text-xs text-gray-500">Track overdue balances categorized by aging periods and send WhatsApp reminders.</p>
+            <p class="text-xs text-blue-200 uppercase font-semibold">System Administrator</p>
+            <h2 id="customerName" class="text-2xl font-extrabold mt-0.5">Admin Dashboard</h2>
           </div>
-          <button onclick="loadDebtors()" class="text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold px-3 py-1.5 rounded-lg border border-gray-300 transition">
-            🔄 Refresh Debtors
-          </button>
+          <span id="customerTypeBadge" class="bg-blue-500/40 text-blue-100 text-xs font-semibold px-2.5 py-1 rounded-full border border-blue-400/30">
+            Administrator
+          </span>
         </div>
 
-        <div class="overflow-x-auto">
-          <table class="w-full text-left border-collapse">
-            <thead>
-              <tr class="bg-red-50 border-b text-xs font-semibold text-red-800 uppercase">
-                <th class="p-3">Customer / Phone</th>
-                <th class="p-3">Invoice No.</th>
-                <th class="p-3">Aging Status</th>
-                <th class="p-3">Amount Due</th>
-                <th class="p-3 text-center">Action</th>
-              </tr>
-            </thead>
-            <tbody id="debtorsTableBody" class="divide-y text-xs">
-              <tr><td colspan="5" class="p-4 text-center text-gray-500">Loading aged debtors list...</td></tr>
-            </tbody>
-          </table>
+        <div class="grid grid-cols-2 gap-4 text-sm">
+          <div>
+            <p class="text-xs text-blue-200">Admin Session ID</p>
+            <p id="customerId" class="font-mono font-bold text-white">ADM-ONLINE</p>
+          </div>
+          <div>
+            <p class="text-xs text-blue-200">System Engine</p>
+            <p id="customerMeter" class="font-mono font-bold text-white">MajiHesabu V1</p>
+          </div>
         </div>
       </div>
-    </section>
 
-    <!-- 5. CUSTOMERS SECTION -->
-    <section id="section-customers" class="tab-content hidden">
-      <div class="bg-white rounded-xl shadow p-6">
-        <div class="flex justify-between items-center mb-4">
-          <h2 class="text-xl font-bold text-gray-800">Customer Directory</h2>
-          <button onclick="loadCustomers()" class="text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold px-3 py-1.5 rounded-lg border border-gray-300 transition">
-            🔄 Refresh List
-          </button>
-        </div>
-        <div class="overflow-x-auto">
-          <table class="w-full text-left border-collapse">
-            <thead>
-              <tr class="bg-gray-100 border-b text-xs font-semibold text-gray-600 uppercase">
-                <th class="p-3">Customer ID</th>
-                <th class="p-3">Name</th>
-                <th class="p-3">Phone</th>
-                <th class="p-3">Location</th>
-                <th class="p-3">Meter Number</th>
-              </tr>
-            </thead>
-            <tbody id="customersTableBody" class="divide-y text-xs">
-              <tr><td colspan="5" class="p-4 text-center text-gray-500">Loading customers...</td></tr>
-            </tbody>
-          </table>
-        </div>
+      <!-- TABS NAVIGATION -->
+      <div class="flex space-x-2 bg-gray-200 p-1.5 rounded-xl text-xs md:text-sm font-bold text-gray-600 overflow-x-auto">
+        <button onclick="switchTab('agedDebtors')" id="tab-agedDebtors" class="tab-btn flex-1 py-2.5 px-3 text-center rounded-lg bg-white text-blue-700 shadow transition whitespace-nowrap">
+          📊 Aged Debtors
+        </button>
+        <button onclick="switchTab('invoices')" id="tab-invoices" class="tab-btn flex-1 py-2.5 px-3 text-center rounded-lg hover:text-blue-700 transition whitespace-nowrap">
+          📋 Invoices
+        </button>
+        <button onclick="switchTab('payments')" id="tab-payments" class="tab-btn flex-1 py-2.5 px-3 text-center rounded-lg hover:text-blue-700 transition whitespace-nowrap">
+          💳 Payments
+        </button>
+        <button onclick="switchTab('trends')" id="tab-trends" class="tab-btn flex-1 py-2.5 px-3 text-center rounded-lg hover:text-blue-700 transition whitespace-nowrap">
+          📈 Consumption
+        </button>
       </div>
-    </section>
 
-    <!-- 6. ADD CUSTOMER SECTION -->
-    <section id="section-addCustomer" class="tab-content hidden">
-      <div class="max-w-xl mx-auto bg-white rounded-xl shadow-md p-6">
-        <h2 class="text-xl font-bold text-gray-800 mb-4 border-b pb-2">Add New Customer</h2>
-        <form id="addCustomerForm" onsubmit="createCustomer(event)">
-          <div class="mb-4">
-            <label class="block text-sm font-semibold text-gray-700 mb-1">Full Name</label>
-            <input type="text" id="newCustomerName" class="w-full border rounded-lg p-2.5 border-gray-300" required>
+      <!-- TAB CONTENTS CONTAINER -->
+      <div class="bg-white rounded-2xl shadow-md p-5 border border-gray-100">
+        
+        <!-- AGED DEBTORS TAB (Primary Admin View) -->
+        <div id="agedDebtorsTab" class="tab-content">
+          <div class="flex justify-between items-center mb-4 border-b pb-3">
+            <div>
+              <h3 class="text-base font-bold text-gray-800">📊 Aged Debtors & Outstanding Accounts</h3>
+              <p class="text-xs text-gray-500">Track all unpaid customer balances categorized by days overdue.</p>
+            </div>
+            <button onclick="loadAgedDebtors()" class="text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold px-3 py-1.5 rounded-lg transition border border-gray-200">
+              🔄 Refresh
+            </button>
           </div>
-          <div class="mb-4">
-            <label class="block text-sm font-semibold text-gray-700 mb-1">Phone Number</label>
-            <input type="text" id="newCustomerPhone" placeholder="07XXXXXXXX" class="w-full border rounded-lg p-2.5 border-gray-300" required>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="bg-gray-50 border-b text-xs font-semibold text-gray-500 uppercase">
+                  <th class="p-3">Customer / Phone</th>
+                  <th class="p-3">Invoice No.</th>
+                  <th class="p-3">Aging Status</th>
+                  <th class="p-3">Amount Due</th>
+                  <th class="p-3 text-center">Action</th>
+                </tr>
+              </thead>
+              <tbody id="agedDebtorsBody" class="divide-y text-xs">
+                <tr>
+                  <td colspan="5" class="p-4 text-center text-gray-400">Loading aged debtors...</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
-          <div class="mb-4">
-            <label class="block text-sm font-semibold text-gray-700 mb-1">Customer Type</label>
-            <select id="newCustomerType" class="w-full border rounded-lg p-2.5 bg-gray-50 border-gray-300" required>
-              <option value="Apartment Tenant">Apartment Tenant</option>
-              <option value="Salty Water Vendor">Salty Water Vendor</option>
-            </select>
+        </div>
+
+        <!-- INVOICES TAB -->
+        <div id="invoicesTab" class="tab-content hidden">
+          <h3 class="text-base font-bold text-gray-800 mb-4 border-b pb-2">Recent System Invoices</h3>
+          <div id="invoicesList" class="overflow-x-auto text-sm">
+            <p class="text-center text-gray-400 py-4">Loading invoices...</p>
           </div>
-          <div class="mb-4">
-            <label class="block text-sm font-semibold text-gray-700 mb-1">Location / House No.</label>
-            <input type="text" id="newCustomerLocation" placeholder="e.g. Mlolongo Phase 3 / B9" class="w-full border rounded-lg p-2.5 border-gray-300" required>
+        </div>
+
+        <!-- PAYMENTS TAB -->
+        <div id="paymentsTab" class="tab-content hidden">
+          <h3 class="text-base font-bold text-gray-800 mb-4 border-b pb-2">Recent Payment Receipts</h3>
+          <div id="paymentsList" class="overflow-x-auto text-sm">
+            <p class="text-center text-gray-400 py-4">Loading payment history...</p>
           </div>
-          <div class="mb-6">
-            <label class="block text-sm font-semibold text-gray-700 mb-1">Meter Serial Number</label>
-            <input type="text" id="newCustomerMeter" class="w-full border rounded-lg p-2.5 border-gray-300" required>
+        </div>
+
+        <!-- USAGE / TRENDS TAB -->
+        <div id="trendsTab" class="tab-content hidden">
+          <h3 class="text-base font-bold text-gray-800 mb-4 border-b pb-2">Overall Consumption Trends</h3>
+          <div id="trendsList" class="overflow-x-auto text-sm">
+            <p class="text-center text-gray-400 py-4">Loading consumption trends...</p>
           </div>
-          <button type="submit" id="addCustomerBtn" class="w-full bg-green-600 text-white font-bold py-3 rounded-lg hover:bg-green-700 transition shadow">
-            Save Customer
-          </button>
-        </form>
+        </div>
+
       </div>
-    </section>
+
+    </div>
 
   </main>
 
-  <!-- WHATSAPP REMINDER PREVIEW MODAL -->
-  <div id="reminderModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
-    <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-gray-100">
-      <div class="flex justify-between items-center mb-4 border-b pb-3">
-        <h3 class="text-base font-bold text-gray-800 flex items-center gap-2">
-          <span>💬</span> Review Reminder Message
-        </h3>
-        <button onclick="closeReminderModal()" class="text-gray-400 hover:text-gray-600 font-bold text-lg">&times;</button>
-      </div>
-
-      <p class="text-xs text-gray-500 mb-2">You can review and edit the custom reminder below before dispatching to WhatsApp:</p>
-
-      <textarea id="modalReminderText" rows="10" class="w-full p-3 text-xs bg-gray-50 border border-gray-300 rounded-xl font-mono focus:bg-white focus:ring-2 focus:ring-green-500 transition"></textarea>
-
-      <div class="flex justify-end gap-2 mt-4">
-        <button onclick="closeReminderModal()" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg text-xs font-semibold transition">
-          Cancel
-        </button>
-        <button onclick="dispatchWhatsAppMessage()" class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-xs font-bold transition shadow flex items-center gap-1.5">
-          🚀 Launch WhatsApp
-        </button>
-      </div>
-    </div>
-  </div>
-
   <!-- FOOTER -->
-  <footer class="text-center py-4 text-xs text-gray-500 bg-white border-t border-gray-200 mt-auto">
-    &copy; 2026 Joy Water Supplies. All rights reserved. Powered by MajiHesabu.
+  <footer class="text-center py-4 text-xs text-gray-400">
+    &copy; 2026 Joy Water Supplies. Admin Engine powered by MajiHesabu.
   </footer>
 
   <script>
-    // -------------------------------------------------------------
-    // CONFIGURATION & GLOBAL STATE
-    // -------------------------------------------------------------
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwpK9chdjn0UvkLLQq8u7H1DpLGep7SMSPYtxp41_hjvOIlydqRjfQYzPh6OXNzUSnd/exec";
-                         
-    let globalCustomersList = [];
-    let activeReminderPhone = "";
+    // ✅ CRITICAL: Make sure SCRIPT_URL is set from config.js
+    const SCRIPT_URL = (typeof CONFIG !== 'undefined' && CONFIG.API_ENDPOINT) 
+      ? CONFIG.API_ENDPOINT 
+      : null;
 
-    // -------------------------------------------------------------
-    // INITIALIZATION & TAB NAVIGATION
-    // -------------------------------------------------------------
+    let currentCustomer = null;
+
     document.addEventListener("DOMContentLoaded", () => {
-      loadDashboard();
-      loadCustomers();
+      // Check for saved local admin session
+      const savedSession = localStorage.getItem("jiw_admin_session");
+      if (savedSession) {
+        try {
+          currentCustomer = JSON.parse(savedSession);
+          showCustomerDashboard();
+        } catch (e) {
+          localStorage.removeItem("jiw_admin_session");
+        }
+      }
     });
 
-    function switchTab(tabName) {
-      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('bg-blue-800'));
+    // Handle Login Submit
+    async function handleLogin(event) {
+      if (event) event.preventDefault();
 
-      const activeSection = document.getElementById(`section-${tabName}`);
-      const activeTabBtn = document.getElementById(`tab-${tabName}`);
+      const phone = document.getElementById('loginPhone').value.trim();
+      const meterNumber = document.getElementById('loginMeter').value.trim();
+      const loginBtn = document.getElementById('loginBtn');
 
-      if (activeSection) activeSection.classList.remove('hidden');
-      if (activeTabBtn) activeTabBtn.classList.add('bg-blue-800');
+      if (!SCRIPT_URL) {
+        showLoginMessage("❌ Configuration error: API endpoint not set in config.js", true);
+        return;
+      }
 
-      if (tabName === 'dashboard') loadDashboard();
-      if (tabName === 'debtors') loadDebtors();
-      if (tabName === 'customers') loadCustomers();
-    }
+      loginBtn.disabled = true;
+      loginBtn.textContent = "Authenticating Admin...";
 
-    // -------------------------------------------------------------
-    // 1. DASHBOARD LOGIC
-    // -------------------------------------------------------------
-    async function loadDashboard() {
       try {
         const response = await fetch(SCRIPT_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify({ action: 'getDashboard' })
+          body: JSON.stringify({ 
+            action: 'authenticate', 
+            phone: phone, 
+            meterNumber: meterNumber 
+          })
         });
 
-        const result = await response.json();
+        const text = await response.text();
+        if (text.trim().startsWith('<')) {
+          throw new Error("Server response error. Please verify API configuration.");
+        }
 
-        if (result.success || result.totalRevenue !== undefined) {
-          renderDashboardUI(result);
+        const result = JSON.parse(text);
+
+        if (result.authenticated || result.success) {
+          currentCustomer = result;
+          localStorage.setItem("jiw_admin_session", JSON.stringify(result));
+          showCustomerDashboard();
+          showLoginMessage("", false);
         } else {
-          console.error("Dashboard error:", result.error || result);
+          showLoginMessage("❌ Invalid credentials. Please check your inputs.", true);
         }
       } catch (err) {
-        console.error("Error loading dashboard:", err);
+        showLoginMessage("❌ Connection error: " + err.message, true);
+      } finally {
+        loginBtn.disabled = false;
+        loginBtn.textContent = "🔓 Access Admin Portal";
       }
     }
 
-    function renderDashboardUI(data) {
-      if (!data) return;
-
-      const formatKES = (val) => `KES ${(Number(val) || 0).toLocaleString('en-KE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-
-      document.getElementById('totalRevenueDisplay').textContent = formatKES(data.totalRevenue);
-      document.getElementById('totalCollectedDisplay').textContent = formatKES(data.totalCollected);
-      document.getElementById('outstandingBalanceDisplay').textContent = formatKES(data.outstandingBalance);
-      document.getElementById('collectionRateDisplay').textContent = `${(Number(data.collectionRate) || 0).toFixed(1)}%`;
-    }
-
-    // -------------------------------------------------------------
-    // 2. CUSTOMERS FETCH & DROPDOWN LOGIC
-    // -------------------------------------------------------------
-    async function loadCustomers() {
-      try {
-        const response = await fetch(SCRIPT_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify({ action: 'loadCustomers' })
-        });
-
-        const result = await response.json();
-
-        if (result.success || Array.isArray(result.data) || Array.isArray(result)) {
-          globalCustomersList = result.data || result;
-          populateCustomerDropdown(globalCustomersList);
-          renderCustomersTable(globalCustomersList);
-        } else {
-          console.error('Failed to load customers:', result.message || result);
-        }
-      } catch (err) {
-        console.error('Error loading customers:', err);
+    function showLoginMessage(message, isError) {
+      const el = document.getElementById('loginMessage');
+      if (message) {
+        el.innerHTML = `
+          <div class="p-3 rounded-lg text-xs font-semibold ${isError ? 'bg-red-50 text-red-700 border border-red-200' : 'bg-green-50 text-green-700 border border-green-200'}">
+            ${message}
+          </div>`;
+      } else {
+        el.innerHTML = '';
       }
     }
 
-    function populateCustomerDropdown(customers) {
-      const selectEl = document.getElementById("customerSelect");
-      const paymentSelectEl = document.getElementById("paymentCustomerSelect");
-      
-      const uniqueCustomers = new Map();
-      customers.forEach(c => {
-        const id = c.customerId || c.id;
-        if (id && !uniqueCustomers.has(id)) {
-          uniqueCustomers.set(id, c);
-        }
-      });
+    function showCustomerDashboard() {
+      document.getElementById('loginSection').classList.add('hidden');
+      document.getElementById('dashboardSection').classList.remove('hidden');
+      document.getElementById('logoutBtn').classList.remove('hidden');
 
-      const optionsHtml = ['<option value="">-- Select Customer --</option>'];
-      uniqueCustomers.forEach(c => {
-        const id = c.customerId || c.id;
-        const displayName = c.name && c.name !== "Customer" ? c.name : c.phone;
-        optionsHtml.push(`<option value="${id}">${displayName} (${c.meterNumber || 'No Meter'})</option>`);
-      });
+      if (currentCustomer && currentCustomer.name) {
+        document.getElementById('customerName').innerText = currentCustomer.name;
+      }
 
-      if (selectEl) selectEl.innerHTML = optionsHtml.join('');
-      if (paymentSelectEl) paymentSelectEl.innerHTML = optionsHtml.join('');
+      // Load initial admin views
+      loadAgedDebtors();
+      loadInvoices();
+      loadPayments();
+      loadTrends();
     }
 
-    function renderCustomersTable(customers) {
-      const tbody = document.getElementById('customersTableBody');
+    // Load Aged Debtors (Admin API Call)
+    async function loadAgedDebtors() {
+      const tbody = document.getElementById('agedDebtorsBody');
       if (!tbody) return;
 
-      if (!Array.isArray(customers) || customers.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-gray-500">No customers found.</td></tr>';
-        return;
-      }
-
-      tbody.innerHTML = customers.map(c => `
-        <tr class="hover:bg-gray-50 transition">
-          <td class="p-3 font-mono text-xs">${c.customerId || c.id || '-'}</td>
-          <td class="p-3 font-semibold text-gray-800">${c.name || 'N/A'}</td>
-          <td class="p-3">${c.phone || 'N/A'}</td>
-          <td class="p-3">${c.location || 'N/A'}</td>
-          <td class="p-3 font-mono text-xs text-blue-600 font-bold">${c.meterNumber || 'N/A'}</td>
-        </tr>
-      `).join('');
-    }
-
-    function onCustomerSelectChange() {
-      const selectElement = document.getElementById('customerSelect');
-      if (!selectElement) return;
-
-      const selectedCustomerId = selectElement.value;
-      const customer = globalCustomersList.find(c => (c.id || c.customerId) === selectedCustomerId);
-
-      const prevInput = document.getElementById('prevReadingInput');
-      if (prevInput) {
-        prevInput.value = (customer && customer.lastReading !== undefined) ? customer.lastReading : 0;
-      }
-
-      calculateConsumption();
-    }
-
-    // -------------------------------------------------------------
-    // 3. LIVE CONSUMPTION & ROLLOVER CALCULATION
-    // -------------------------------------------------------------
-    function calculateConsumption() {
-      const prevInput = document.getElementById('prevReadingInput');
-      const currInput = document.getElementById('currentReadingInput');
-      const rolloverCheck = document.getElementById('isRolloverCheckbox');
-      const consumptionDisplay = document.getElementById('consumptionPreview');
-      const costDisplay = document.getElementById('costPreview');
-      const submitBtn = document.getElementById('submitReadingBtn');
-
-      if (!prevInput || !currInput || !consumptionDisplay) return;
-
-      const previous = parseFloat(prevInput.value) || 0;
-      const currentVal = currInput.value.trim();
-      const isRollover = rolloverCheck ? rolloverCheck.checked : false;
-
-      if (currentVal === "") {
-        consumptionDisplay.textContent = "0 m³";
-        consumptionDisplay.className = "text-gray-500 font-bold";
-        if (costDisplay) costDisplay.textContent = "KES 0.00";
-        if (submitBtn) submitBtn.disabled = false;
-        return;
-      }
-
-      const current = parseFloat(currentVal);
-
-      if (isNaN(current)) {
-        consumptionDisplay.textContent = "Invalid entry";
-        consumptionDisplay.className = "text-red-500 font-bold";
-        if (costDisplay) costDisplay.textContent = "KES 0.00";
-        if (submitBtn) submitBtn.disabled = true;
-        return;
-      }
-
-      let consumption = 0;
-      const RATE_PER_UNIT = 100; // Standard water rate per m³
-
-      if (isRollover) {
-        consumption = current;
-        consumptionDisplay.textContent = `${consumption.toFixed(2)} m³ (Meter Reset / Rollover Active)`;
-        consumptionDisplay.className = "text-amber-600 font-bold";
-        if (submitBtn) submitBtn.disabled = false;
-      } else {
-        consumption = current - previous;
-
-        if (consumption < 0) {
-          consumptionDisplay.textContent = `${consumption.toFixed(2)} m³ (Error: Reading lower than previous)`;
-          consumptionDisplay.className = "text-red-600 font-bold";
-          if (costDisplay) costDisplay.textContent = "KES 0.00";
-          if (submitBtn) submitBtn.disabled = true;
-          return;
-        } else {
-          consumptionDisplay.textContent = `${consumption.toFixed(2)} m³`;
-          consumptionDisplay.className = "text-green-600 font-bold";
-          if (submitBtn) submitBtn.disabled = false;
-        }
-      }
-
-      if (costDisplay) {
-        const estimatedCost = consumption * RATE_PER_UNIT;
-        costDisplay.textContent = `KES ${estimatedCost.toLocaleString('en-KE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-      }
-    }
-
-    // -------------------------------------------------------------
-    // 4. RECORD READING SUBMISSION
-    // -------------------------------------------------------------
-    async function recordReading(event) {
-      if (event) event.preventDefault();
-
-      const customerSelect = document.getElementById('customerSelect');
-      const readingInput = document.getElementById('currentReadingInput');
-      const rolloverCheck = document.getElementById('isRolloverCheckbox');
-      const submitBtn = document.getElementById('submitReadingBtn');
-
-      const customerId = customerSelect ? customerSelect.value : '';
-      const reading = readingInput ? readingInput.value.trim() : '';
-      const isRollover = rolloverCheck ? rolloverCheck.checked : false;
-
-      if (!customerId || reading === '') {
-        alert("Please select a customer and enter a meter reading.");
-        return;
-      }
-
-      if (submitBtn) {
-        submitBtn.disabled = true;
-        submitBtn.textContent = "Recording...";
-      }
-
-      const payload = {
-        action: 'recordMeterReading',
-        customerId: customerId,
-        reading: reading,
-        isRollover: isRollover,
-        recordedBy: 'Admin'
-      };
+      tbody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-gray-400">Loading aged debtors...</td></tr>';
 
       try {
         const response = await fetch(SCRIPT_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify(payload)
+          body: JSON.stringify({ action: 'getAgedDebtors' })
         });
 
-        const result = await response.json();
+        const text = await response.text();
+        if (text.trim().startsWith('<')) throw new Error("Server returned HTML error");
 
-        if (result.success) {
-          alert(`✅ ${result.message || 'Reading recorded successfully!'}\nInvoice ID: ${result.invoiceId || 'N/A'}`);
-          
-          readingInput.value = '';
-          if (rolloverCheck) rolloverCheck.checked = false;
-          
-          await loadCustomers();
-          switchTab('dashboard');
-        } else {
-          alert(`❌ Error: ${result.message || 'Failed to record reading'}`);
-        }
-      } catch (err) {
-        console.error('Error recording reading:', err);
-        alert('Server communication error.');
-      } finally {
-        if (submitBtn) {
-          submitBtn.disabled = false;
-          submitBtn.textContent = "Record Reading & Generate Invoice";
-        }
-      }
-    }
+        const data = JSON.parse(text);
+        const debtors = data.debtors || data.data || [];
 
-    // -------------------------------------------------------------
-    // 5. RECORD MANUAL PAYMENT
-    // -------------------------------------------------------------
-    async function recordManualPayment(event) {
-      if (event) event.preventDefault();
-
-      const customerId = document.getElementById('paymentCustomerSelect').value;
-      const invoiceId = document.getElementById('paymentInvoiceId').value.trim();
-      const amount = document.getElementById('paymentAmount').value.trim();
-      const paymentMode = document.getElementById('paymentMode').value;
-      const reference = document.getElementById('paymentReference').value.trim();
-      const submitBtn = document.getElementById('submitPaymentBtn');
-
-      if (!customerId || !amount) {
-        alert("Please select a customer and enter the amount paid.");
-        return;
-      }
-
-      if (submitBtn) {
-        submitBtn.disabled = true;
-        submitBtn.textContent = "Processing Payment...";
-      }
-
-      const payload = {
-        action: 'recordPayment',
-        payload: {
-          customerId: customerId,
-          invoiceId: invoiceId,
-          amount: amount,
-          paymentMode: paymentMode,
-          reference: reference,
-          recordedBy: 'Admin'
-        }
-      };
-
-      try {
-        const response = await fetch(SCRIPT_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify(payload)
-        });
-
-        const result = await response.json();
-
-        if (result.success) {
-          alert(`✅ ${result.message || 'Payment recorded successfully!'}`);
-          
-          document.getElementById('paymentForm').reset();
-          await loadCustomers();
-          switchTab('dashboard');
-        } else {
-          alert(`❌ Error: ${result.message || 'Failed to record payment'}`);
-        }
-      } catch (err) {
-        console.error('Error recording payment:', err);
-        alert('Server communication error.');
-      } finally {
-        if (submitBtn) {
-          submitBtn.disabled = false;
-          submitBtn.textContent = "Record Payment & Issue Receipt";
-        }
-      }
-    }
-
-    // -------------------------------------------------------------
-    // 6. AGED DEBTORS LOGIC WITH FIRM & COURTEOUS REMINDERS
-    // -------------------------------------------------------------
-    async function loadDebtors() {
-      const tbody = document.getElementById('debtorsTableBody');
-      if (tbody) tbody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-gray-500">Loading aged debtors...</td></tr>';
-
-      try {
-        const response = await fetch(SCRIPT_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify({ action: 'getDebtors' })
-        });
-
-        const result = await response.json();
-        const debtorsList = result.data || result.debtors || (Array.isArray(result) ? result : []);
-
-        if (debtorsList.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-gray-500">🎉 No outstanding debtors found!</td></tr>';
+        if (debtors.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-gray-400">🎉 No outstanding debtors found!</td></tr>';
           return;
         }
 
-        tbody.innerHTML = debtorsList.map(item => {
-          const name = item.customerName || item.name || 'Valued Customer';
-          const phone = item.phone || item.customerPhone || 'N/A';
-          const invoiceNo = item.invoiceNo || item.invoiceId || 'N/A';
-          const amountDue = Number(item.amountDue || item.balance || item.amount || 0);
-          const ageDays = Number(item.ageDays || item.daysOverdue || item.agingDays || 0);
+        tbody.innerHTML = debtors.map(item => {
+          const daysOverdue = Number(item.daysOverdue || item.agingDays || 0);
+          let badgeStyle = "bg-yellow-100 text-yellow-800 border-yellow-200"; // 0-30 Days
+          let statusText = `${daysOverdue} Days (Current)`;
 
-          let badgeStyle = "bg-yellow-100 text-yellow-800 border-yellow-200";
-          let statusText = `${ageDays} Days (Current)`;
-
-          if (ageDays > 60) {
-            badgeStyle = "bg-red-100 text-red-800 border-red-200 font-bold";
-            statusText = `${ageDays} Days (Critical)`;
-          } else if (ageDays > 30) {
-            badgeStyle = "bg-orange-100 text-orange-800 border-orange-200";
-            statusText = `${ageDays} Days (Overdue)`;
+          if (daysOverdue > 60) {
+            badgeStyle = "bg-red-100 text-red-800 border-red-200"; // 60+ Days
+            statusText = `${daysOverdue} Days (Critical)`;
+          } else if (daysOverdue > 30) {
+            badgeStyle = "bg-orange-100 text-orange-800 border-orange-200"; // 31-60 Days
+            statusText = `${daysOverdue} Days (Overdue)`;
           }
 
-          const escapedName = name.replace(/'/g, "\\'");
+          const phone = item.phone || item.customerPhone || 'N/A';
+          const cleanPhone = phone.replace(/\+/g, '');
+          const name = item.customerName || item.name || 'Unknown';
+          const invNo = item.invoiceNo || item.invoiceId || 'N/A';
+          const amount = Number(item.amountDue || item.balance || item.amount || 0);
+
+          const waMessage = encodeURIComponent(
+            `Hello ${name}, this is a payment reminder regarding unpaid invoice ${invNo} from Joy Water Supplies for KES ${amount.toLocaleString()}. Kindly arrange payment at your earliest convenience.`
+          );
 
           return `
-            <tr class="hover:bg-red-50/50 transition">
+            <tr class="hover:bg-gray-50 transition">
               <td class="p-3">
                 <div class="font-bold text-gray-800">${name}</div>
                 <div class="text-[11px] text-gray-500 font-mono">${phone}</div>
               </td>
-              <td class="p-3 font-mono font-semibold text-gray-700">${invoiceNo}</td>
+              <td class="p-3 font-mono font-semibold text-gray-700">${invNo}</td>
               <td class="p-3">
                 <span class="px-2.5 py-1 rounded-full text-[10px] font-bold border ${badgeStyle}">
                   ${statusText}
                 </span>
               </td>
               <td class="p-3 font-bold text-red-600">
-                KES ${amountDue.toLocaleString()}
+                KES ${amount.toLocaleString()}
               </td>
               <td class="p-3 text-center">
-                <button onclick="prepareCourteousReminder('${phone}', '${escapedName}', '${invoiceNo}', ${amountDue}, ${ageDays})" 
-                        class="bg-green-600 hover:bg-green-700 text-white font-bold px-3 py-1.5 rounded-lg text-xs inline-flex items-center gap-1 shadow-sm transition mx-auto">
+                <a href="https://wa.me/${cleanPhone}?text=${waMessage}" 
+                   target="_blank" 
+                   class="bg-green-600 hover:bg-green-700 text-white font-bold px-2.5 py-1.5 rounded-lg text-[11px] inline-flex items-center gap-1 shadow-sm transition">
                   💬 Remind
-                </button>
+                </a>
               </td>
             </tr>
           `;
         }).join('');
 
       } catch (err) {
-        console.error("Error loading debtors:", err);
-        if (tbody) tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-red-500 font-medium">Failed to load debtors list: ${err.message}</td></tr>`;
+        console.error("Aged debtors error:", err);
+        tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-red-500 font-medium">❌ Error loading aged debtors: ${err.message}</td></tr>`;
       }
     }
 
-    // Prepare Courteous Reminder Message & Launch Preview Modal
-    function prepareCourteousReminder(phone, customerName, invoiceNo, amountDue, ageDays) {
-      if (!phone || phone === 'N/A') {
-        alert("Phone number is missing for this customer.");
-        return;
-      }
-
-      let formattedPhone = phone.replace(/[^0-9]/g, '');
-      if (formattedPhone.startsWith('0')) formattedPhone = '254' + formattedPhone.slice(1);
-      activeReminderPhone = formattedPhone;
-
-      let toneMessage = "";
-      if (ageDays > 60) {
-        toneMessage = `We notice invoice *${invoiceNo}* is currently past due (${ageDays} days). Kindly prioritize clearing this balance to ensure uninterrupted water supply services.`;
-      } else {
-        toneMessage = `This is a friendly reminder regarding pending invoice *${invoiceNo}* for KES ${Number(amountDue).toLocaleString()}. Kindly make payment at your earliest convenience.`;
-      }
-
-      const text = 
-`Dear ${customerName || 'Valued Customer'},
-
-Hope this message finds you well. 💧
-
-${toneMessage}
-
-💳 *Payment Options:*
-- Buy Goods Till Number: *5663845* (Joy Water Supplies)
-- Reference: Your Meter No. / ${invoiceNo}
-
-If you have already made this payment, please disregard this note or share the M-Pesa receipt for quick reconciliation.
-
-Thank you for your partnership!
-*Joy Water Supplies*
-☎ 0713 170 222`;
-
-      document.getElementById('modalReminderText').value = text;
-      document.getElementById('reminderModal').classList.remove('hidden');
-      document.getElementById('reminderModal').classList.add('flex');
-    }
-
-    function closeReminderModal() {
-      document.getElementById('reminderModal').classList.add('hidden');
-      document.getElementById('reminderModal').classList.remove('flex');
-    }
-
-    function dispatchWhatsAppMessage() {
-      const text = document.getElementById('modalReminderText').value;
-      if (!text || !activeReminderPhone) {
-        alert("Invalid message payload or missing recipient phone.");
-        return;
-      }
-
-      window.open(`https://wa.me/${activeReminderPhone}?text=${encodeURIComponent(text)}`, '_blank');
-      closeReminderModal();
-    }
-
-    // -------------------------------------------------------------
-    // 7. CREATE CUSTOMER LOGIC
-    // -------------------------------------------------------------
-    async function createCustomer(event) {
-      if (event) event.preventDefault();
-
-      const btn = document.getElementById('addCustomerBtn');
-      const name = document.getElementById('newCustomerName').value.trim();
-      const phone = document.getElementById('newCustomerPhone').value.trim();
-      const type = document.getElementById('newCustomerType').value;
-      const location = document.getElementById('newCustomerLocation').value.trim();
-      const meterNumber = document.getElementById('newCustomerMeter').value.trim();
-
-      if (btn) {
-        btn.disabled = true;
-        btn.textContent = "Saving Customer...";
-      }
-
-      const payload = {
-        action: 'createCustomer',
-        name: name,
-        phone: phone,
-        type: type,
-        location: location,
-        meterNumber: meterNumber,
-        email: '',
-        notes: ''
-      };
-
+    // Load Invoices
+    async function loadInvoices() {
+      const listEl = document.getElementById('invoicesList');
       try {
         const response = await fetch(SCRIPT_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify(payload)
+          body: JSON.stringify({ 
+            action: 'getInvoiceHistory', 
+            months: 6 
+          })
         });
 
-        const result = await response.json();
+        const text = await response.text();
+        if (text.trim().startsWith('<')) throw new Error("Server response error");
 
-        if (result.success) {
-          alert('✅ Customer added successfully!');
-          document.getElementById('addCustomerForm').reset();
-          await loadCustomers();
-          switchTab('customers');
+        const data = JSON.parse(text);
+        const invoices = data.invoices || data.data || [];
+
+        if (invoices.length > 0) {
+          listEl.innerHTML = `
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="bg-gray-50 border-b text-xs font-semibold text-gray-500 uppercase">
+                  <th class="p-2.5">Month/Date</th>
+                  <th class="p-2.5">Amount</th>
+                  <th class="p-2.5">Status</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y text-xs">
+                ${invoices.map(inv => {
+                  const status = inv.status || 'UNPAID';
+                  const isPaid = status.toUpperCase() === 'PAID';
+                  return `
+                    <tr class="hover:bg-gray-50">
+                      <td class="p-2.5 font-medium">${inv.month || inv.date || 'N/A'}</td>
+                      <td class="p-2.5 font-bold">KES ${(Number(inv.totalAmount || inv.amount) || 0).toLocaleString()}</td>
+                      <td class="p-2.5">
+                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${isPaid ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
+                          ${status}
+                        </span>
+                      </td>
+                    </tr>
+                  `;
+                }).join('')}
+              </tbody>
+            </table>`;
         } else {
-          alert('❌ Error: ' + (result.message || 'Failed to add customer'));
+          listEl.innerHTML = '<p class="text-center text-gray-400 py-4">No recent invoices found.</p>';
         }
       } catch (err) {
-        console.error("Error creating customer:", err);
-        alert('Server communication error.');
-      } finally {
-        if (btn) {
-          btn.disabled = false;
-          btn.textContent = "Save Customer";
-        }
+        listEl.innerHTML = '<p class="text-center text-red-500 py-4">Unable to load invoices.</p>';
       }
+    }
+
+    // Load Payments
+    async function loadPayments() {
+      const listEl = document.getElementById('paymentsList');
+      try {
+        const response = await fetch(SCRIPT_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({ action: 'getPaymentHistory' })
+        });
+
+        const text = await response.text();
+        if (text.trim().startsWith('<')) throw new Error("Server response error");
+
+        const data = JSON.parse(text);
+        const payments = data.payments || data.data || [];
+
+        if (payments.length > 0) {
+          listEl.innerHTML = `
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="bg-gray-50 border-b text-xs font-semibold text-gray-500 uppercase">
+                  <th class="p-2.5">Date</th>
+                  <th class="p-2.5">Amount</th>
+                  <th class="p-2.5">Method</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y text-xs">
+                ${payments.map(pay => `
+                  <tr class="hover:bg-gray-50">
+                    <td class="p-2.5 font-medium">${pay.paymentDate || pay.date || 'N/A'}</td>
+                    <td class="p-2.5 font-bold text-green-600">KES ${(Number(pay.amount) || 0).toLocaleString()}</td>
+                    <td class="p-2.5 text-gray-500">${pay.method || pay.paymentMethod || 'M-Pesa'}</td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>`;
+        } else {
+          listEl.innerHTML = '<p class="text-center text-gray-400 py-4">No payment history found.</p>';
+        }
+      } catch (err) {
+        listEl.innerHTML = '<p class="text-center text-red-500 py-4">Unable to load payment history.</p>';
+      }
+    }
+
+    // Load Trends
+    async function loadTrends() {
+      const listEl = document.getElementById('trendsList');
+      try {
+        const response = await fetch(SCRIPT_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({ action: 'getConsumptionTrends', months: 6 })
+        });
+
+        const text = await response.text();
+        if (text.trim().startsWith('<')) throw new Error("Server response error");
+
+        const data = JSON.parse(text);
+        const trends = data.trends || data.data || [];
+
+        if (trends.length > 0) {
+          listEl.innerHTML = `
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="bg-gray-50 border-b text-xs font-semibold text-gray-500 uppercase">
+                  <th class="p-2.5">Month</th>
+                  <th class="p-2.5">Consumption</th>
+                  <th class="p-2.5">Billed Amount</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y text-xs">
+                ${trends.map(t => `
+                  <tr class="hover:bg-gray-50">
+                    <td class="p-2.5 font-medium">${t.month || 'N/A'}</td>
+                    <td class="p-2.5 font-bold text-blue-600">${t.consumption || 0} m³</td>
+                    <td class="p-2.5 font-semibold">KES ${(Number(t.amount) || 0).toLocaleString()}</td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>`;
+        } else {
+          listEl.innerHTML = '<p class="text-center text-gray-400 py-4">No consumption trends recorded.</p>';
+        }
+      } catch (err) {
+        listEl.innerHTML = '<p class="text-center text-red-500 py-4">Unable to load consumption trends.</p>';
+      }
+    }
+
+    // Tab Switcher
+    function switchTab(tabName) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('bg-white', 'text-blue-700', 'shadow');
+      });
+
+      const activeTabBtn = document.getElementById(`tab-${tabName}`);
+      const activeContent = document.getElementById(`${tabName}Tab`);
+
+      if (activeTabBtn) activeTabBtn.classList.add('bg-white', 'text-blue-700', 'shadow');
+      if (activeContent) activeContent.classList.remove('hidden');
+    }
+
+    // Logout
+    function logout() {
+      currentCustomer = null;
+      localStorage.removeItem("jiw_admin_session");
+      document.getElementById('loginSection').classList.remove('hidden');
+      document.getElementById('dashboardSection').classList.add('hidden');
+      document.getElementById('logoutBtn').classList.add('hidden');
+      document.getElementById('loginPhone').value = '';
+      document.getElementById('loginMeter').value = '';
     }
   </script>
 </body>
